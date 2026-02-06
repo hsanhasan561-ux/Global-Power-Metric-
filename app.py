@@ -5,25 +5,27 @@ import pandas as pd
 from datetime import datetime
 
 # ১. ডাটাবেস ইঞ্জিন সেটআপ
+# Streamlit Cloud এর জন্য ডাটাবেস কানেকশন একটু আলাদাভাবে হ্যান্ডেল করতে হয়
 conn = sqlite3.connect('global_power_metric.db', check_same_thread=False)
 c = conn.cursor()
 
 def init_db():
+    # ইউজার টেবিল - এখানে মোট ১১টি কলাম আছে
     c.execute('''CREATE TABLE IF NOT EXISTS users 
                  (username TEXT PRIMARY KEY, password TEXT, full_name TEXT, 
                  ref_by TEXT, side TEXT, balance REAL, status TEXT, 
                  bkash TEXT, rank TEXT, kyc_status TEXT, trx_id TEXT)''')
     
+    # ট্রানজ্যাকশন টেবিল
     c.execute('''CREATE TABLE IF NOT EXISTS transactions 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, type TEXT, amount REAL, date TEXT)''')
     
-    c.execute('''CREATE TABLE IF NOT EXISTS withdraw_requests 
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, amount REAL, method TEXT, status TEXT, date TEXT)''')
-    
+    # অ্যাডমিন একাউন্ট চেক - এখানেও ১১টি ভ্যালু নিশ্চিত করা হয়েছে
     c.execute("SELECT * FROM users WHERE username='admin'")
     if not c.fetchone():
         admin_pass = hashlib.sha256("admin123".encode()).hexdigest()
-        c.execute("INSERT INTO users VALUES ('admin', ?, 'Chief Admin', 'None', 'None', 0.0, 'Active', '01700', 'CEO', 'Verified', 'MASTER')")
+        # এখানে ১১টি ভ্যালু আছে কি না গুনে দেখুন (admin থেকে MASTER পর্যন্ত)
+        c.execute("INSERT INTO users VALUES ('admin', ?, 'Chief Admin', 'None', 'None', 0.0, 'Active', '01700', 'CEO', 'Verified', 'MASTER')", (admin_pass,))
     conn.commit()
 
 init_db()
@@ -77,12 +79,14 @@ if not st.session_state.logged_in:
         if st.button("রেজিস্ট্রেশন করুন"):
             if new_u and new_p and ref_id and trx:
                 try:
+                    hp = hash_pass(new_p)
+                    # রেজিস্ট্রেশনের সময় ১১টি ভ্যালু ইনসার্ট করা হচ্ছে
                     c.execute("INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
-                              (new_u, hash_pass(new_p), new_u, ref_id, side, 0.0, 'Pending', '', 'Member', 'Pending', trx))
+                              (new_u, hp, new_u, ref_id, side, 0.0, 'Pending', '', 'Member', 'Pending', trx))
                     conn.commit()
                     st.success("আবেদন সফল! অ্যাডমিন যাচাই করে একটিভ করে দিবে।")
-                except:
-                    st.error("এই ইউজারনেমটি আগেই ব্যবহার হয়েছে।")
+                except Exception as e:
+                    st.error(f"এরর: {e}")
 
 else:
     # ৫. ড্যাশবোর্ড
@@ -91,7 +95,7 @@ else:
     user_info = c.fetchone()
 
     st.sidebar.title("⚡ GPM প্যানেল")
-    menu = st.sidebar.radio("মেনু", ["ড্যাশবোর্ড", "আমার টিম", "উইথড্র", "অ্যাডমিন প্যানেল"])
+    menu = st.sidebar.radio("মেনু", ["ড্যাশবোর্ড", "আমার টিম", "অ্যাডমিন প্যানেল"])
 
     if menu == "ড্যাশবোর্ড":
         st.subheader(f"স্বাগতম, {user_info[2]}")
@@ -100,10 +104,6 @@ else:
         col2.markdown(f'<div class="metric-card"><h3>স্ট্যাটাস</h3><h2>{user_info[6]}</h2></div>', unsafe_allow_html=True)
         col3.markdown(f'<div class="metric-card"><h3>র‍্যাঙ্ক</h3><h2>{user_info[8]}</h2></div>', unsafe_allow_html=True)
         
-        st.write("---")
-        if st.button("💰 ডেইলি ROI সংগ্রহ করুন"):
-            st.success("৳২০ আপনার ওয়ালেটে যোগ হয়েছে!")
-
     elif menu == "অ্যাডমিন প্যানেল":
         if user != "admin":
             st.error("শুধুমাত্র অ্যাডমিনের জন্য!")
@@ -120,4 +120,4 @@ else:
     if st.sidebar.button("লগআউট"):
         st.session_state.logged_in = False
         st.rerun()
-  
+    
