@@ -1,9 +1,287 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My AI App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAJMUL MASTER AI V10 PRO</title>
+    <style>
+        :root { --primary-bg: #040608; --panel-bg: #0d1117; --accent: #00FFCC; --delete-red: #ff4d4d; }
+        body { background-color: var(--primary-bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; }
+        .login-box { background: var(--panel-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--accent); text-align: center; }
+        #mainApp { display: none; width: 100%; max-width: 450px; text-align: center; }
+        
+        /* Number Grid */
+        .number-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .num-btn { border: none; border-radius: 5px; height: 40px; color: white; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .n5, .n6 { background: #ff4d4d; } .n7 { background: #9b59b6; } .n8, .n9 { background: #34495e; }
+        .n0, .n1 { background: #2ecc71; } .n2 { background: #16a085; } .n3, .n4 { background: #f39c12; }
+        .bg-blue { background: #3498db; font-size: 10px; } .bg-orange { background: #e67e22; font-size: 10px; }
+
+        .input-info { color: var(--accent); font-size: 14px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+        
+        /* 唳 唳熰唳曕唳膏 唳唰嵿Ω */
+        #patternDisplay { 
+            width: 100%; padding: 20px; border-radius: 8px; border: 2px solid var(--accent); 
+            background: #111; color: var(--accent); margin-bottom: 15px; min-height: 70px; 
+            font-size: 20px; font-weight: bold; box-sizing: border-box; display: flex; 
+            align-items: center; justify-content: center; font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5); text-align: center;
+        }
+        
+        input { width: 100%; padding: 12px; margin-bottom: 10px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .btn-get { background: linear-gradient(90deg, #00FFCC, #00d2ff); color: #000; width: 100%; font-weight: 900; height: 55px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3); }
+
+        #searchLoader { display: none; margin: 15px 0; color: var(--accent); font-weight: bold; font-size: 16px; }
+        .loader-dots::after { content: '...'; animation: dots 1.5s steps(5, end) infinite;}
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } }
+
+        /* Floating Result Window */
+        #floatingOverlay { 
+            display: none; position: fixed; top: 20%; right: 10px; width: 230px; 
+            background: rgba(13, 20, 30, 0.98); border: 2.5px solid var(--accent); 
+            border-radius: 15px; padding: 20px; z-index: 10000; text-align: center; 
+            box-shadow: 0 0 40px rgba(0,255,204,0.6); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .float-res { font-size: 42px; font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 1; }
+        .float-nums { font-size: 26px; color: #FFEB3B; font-weight: bold; letter-spacing: 6px; margin-bottom: 10px; }
+
+        .history-section { width: 100%; margin-top: 25px; background: #0d1117; border-radius: 10px; padding: 12px; border: 1px solid #222; }
+        table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #222; text-align: center; }
+
+        .social-btn { display: block; padding: 14px; border-radius: 10px; text-decoration: none; font-weight: bold; color: white; font-size: 15px; margin-top: 10px; text-align: center; transition: 0.3s; }
+        .tg-link { background: #0088cc; box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3); }
+        .app-link { background: #2ecc71; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
+    </style>
 </head>
 <body>
-  <h1>Hello, this is my AI App!</h1>
+
+<div id="loginScreen">
+    <div class="login-box">
+        <h2 style="color: var(--accent); margin-bottom: 20px;">馃攼 VIP AI LOGIN</h2>
+        <input type="password" id="passInput" placeholder="Enter Password">
+        <button class="btn-get" onclick="checkLogin()">LOGIN NOW</button>
+    </div>
+</div>
+
+<div id="mainApp">
+    <h2 style="color: var(--accent); margin: 0 0 5px 0; letter-spacing: 1px;">馃敟 NAJMUL MASTER AI V10</h2>
+    <div class="input-info">last 10 period input</div>
+    
+    <div class="number-grid" style="margin-top: 15px;">
+        <button class="num-btn bg-blue" disabled>+Big</button>
+        <button class="num-btn n5" onclick="addNum(5)">5</button>
+        <button class="num-btn n6" onclick="addNum(6)">6</button>
+        <button class="num-btn n7" onclick="addNum(7)">7</button>
+        <button class="num-btn n8" onclick="addNum(8)">8</button>
+        <button class="num-btn n9" onclick="addNum(9)">9</button>
+        <button class="num-btn bg-orange" disabled>+Small</button>
+        <button class="num-btn n0" onclick="addNum(0)">0</button>
+        <button class="num-btn n1" onclick="addNum(1)">1</button>
+        <button class="num-btn n2" onclick="addNum(2)">2</button>
+        <button class="num-btn n3" onclick="addNum(3)">3</button>
+        <button class="num-btn n4" onclick="addNum(4)">4</button>
+    </div>
+
+    <div style="display:flex; justify-content: space-between; margin-bottom: 8px; width: 100%;">
+        <span id="counter" style="color:var(--accent); font-size:13px; font-weight:bold;">Input (0/10)</span>
+        <button onclick="deleteLast()" style="background:var(--delete-red); border:none; color:white; border-radius:5px; padding:4px 12px; cursor:pointer; font-weight:bold;">DELETE</button>
+    </div>
+    
+    <div id="patternDisplay">唳嗋唰囙Π 10 唳熰 唳班唳溹唳侧唳� 唳︵唳�</div>
+
+    <input type="number" id="periodInput" placeholder="唳唳班唰熰Α 唳ㄠΞ唰嵿Μ唳� 唳︵唳� (唳唳Θ: 123)">
+    <button class="btn-get" onclick="startProcess()">馃殌 GET PRO SIGNAL</button>
+
+    <div id="searchLoader">AI 唳唳班-唳侧唳唳� 唳忇Θ唳距Σ唳距唳膏唳� 唳曕Π唳涏<span class="loader-dots"></span></div>
+
+    <div id="floatingOverlay">
+        <div style="font-size: 12px; color: var(--accent); font-weight:bold;">1 wingo minute AI Signal</div>
+        <div id="floatPred" class="float-res">--</div>
+        <div id="floatNums" class="float-nums">--</div>
+        <div style="font-size:11px; color:#888;">System: Dk stablish</div>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+            <button onclick="record('WIN')" style="flex:1; background:#2ecc71; border:none; color:#fff; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">WIN</button>
+            <button onclick="record('LOSS')" style="flex:1; background:#e74c3c; border:none; color:#fff; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">LOSS</button>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <div style="text-align:left; color:var(--accent); font-size:15px; margin-bottom:12px; font-weight:bold;">馃晵 Data Intelligence History</div>
+        <table>
+            <thead><tr><th>Period</th><th>Prediction</th><th>Result</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </div>
+
+    <a href="https://t.me/your_telegram" class="social-btn tg-link">鉁堬笍 JOIN TELEGRAM CHANNEL</a>
+    <a href="#" class="social-btn app-link">馃摬 DOWNLOAD FULL APP</a>
+</div>
+
+<script>
+    // 唳嗋Κ唳ㄠ唳� 唳︵唳撪唳� 唳膏Ξ唳膏唳� 唳∴唳熰唳唳�
+    const MASTER_DB = [
+        { pattern: "SSSSS", next: "BIG", n: "7,9" },
+        { pattern: "BBBBB", next: "SMALL", n: "0,2" },
+        { pattern: "BSBSB", next: "SMALL", n: "1,3" },
+        { pattern: "SBSBS", next: "BIG", n: "6,8" },
+        { pattern: "BBSSB", next: "BIG", n: "5,7" },
+        { pattern: "SSBBS", next: "SMALL", n: "2,4" },
+        { pattern: "BBSBS", next: "SMALL", n: "0,4" },
+        { pattern: "SBBSB", next: "BIG", n: "9,7" },-
+        { pattern: "BBSBSSBBSS", next: "BIG", n: "7,9" },
+        { pattern: "SSBSBBSSBB", next: "SMALL", n: "0,2" },
+        { pattern: "BBBSBSSBBS", next: "BIG", n: "8,5" },
+        { pattern: "SSSBSBBSBB", next: "SMALL", n: "1,4" },
+        { pattern: "BSBSBSSBBS", next: "SMALL", n: "3,0" },
+        { pattern: "SBSBSBBSBB", next: "BIG", n: "6,9" },
+        { pattern: "BBSSBBSBSB", next: "SMALL", n: "2,4" },
+        { pattern: "SSBBSSBSBS", next: "BIG", n: "5,7" },
+        { pattern: "BSSBBSBSBS", next: "BIG", n: "8,6" },
+        { pattern: "SBBSBBSBSB", next: "SMALL", n: "1,3" },
+
+        // --- 唳嗋唰囙Π 唰ㄠЕ唰︵唳� 唳∴唳熰 ---
+        { pattern: "SSSSS", next: "BIG", n: "7,9" }, { pattern: "BBBBB", next: "SMALL", n: "0,2" },
+        { pattern: "BBSSB", next: "BIG", n: "5,8" }, { pattern: "SSBBS", next: "SMALL", n: "1,3" },
+        { pattern: "BSBSB", next: "SMALL", n: "4,2" }, { pattern: "SBSBS", next: "BIG", n: "6,7" },
+        { pattern: "BBBSB", next: "SMALL", n: "0,1" }, { pattern: "SSSBS", next: "BIG", n: "9,5" },
+        { pattern: "BSSBB", next: "BIG", n: "8,6" }, { pattern: "SBBSS", next: "SMALL", n: "3,2" },
+        { pattern: "28483725", next: "SMALL", n: "0,4" }, { pattern: "046827803", next: "BIG", n: "5,7" },
+        { pattern: "9880106123", next: "BIG", n: "8,9" }, { pattern: "742305", next: "BIG", n: "9,6" },
+        { pattern: "042361", next: "SMALL", n: "1,3" }, { pattern: "846805", next: "SMALL", n: "2,4" },
+        { pattern: "BBBSS", next: "BIG", n: "7,5" }, { pattern: "SSSBB", next: "SMALL", n: "0,4" },
+        { pattern: "BSBSS", next: "BIG", n: "9,8" }, { pattern: "SBSBB", next: "SMALL", n: "1,2" },
+        { pattern: "BBSSBBSS", next: "BIG", n: "7,9" }, { pattern: "SSBBSSBB", next: "SMALL", n: "0,2" },
+        { pattern: "BBBBSSBB", next: "SMALL", n: "3,0" }, { pattern: "SSSSBBSS", next: "BIG", n: "6,9" },
+        { pattern: "BSSBSSBS", next: "BIG", n: "7,5" }, { pattern: "SBB SBB SB", next: "SMALL", n: "2,4" },
+        { pattern: "BSBSSBSB", next: "BIG", n: "8,9" }, { pattern: "SBSBB SBS", next: "SMALL", n: "1,0" },
+        { pattern: "BBBSBBBS", next: "SMALL", n: "0,3" }, { pattern: "SSSBSSSB", next: "BIG", n: "7,5" },
+        { pattern: "BBSSSBBS", next: "BIG", n: "9,6" }, { pattern: "SSBBBSBB", next: "SMALL", n: "1,4" },
+        { pattern: "BSBBSSBB", next: "BIG", n: "8,7" }, { pattern: "SBSSBBSS", next: "SMALL", n: "2,3" },
+        { pattern: "BBBBSBBB", next: "SMALL", n: "0,1" }, { pattern: "SSSSS BSS", next: "BIG", n: "9,5" },
+        { pattern: "BSBSB SBS", next: "BIG", n: "7,8" }, { pattern: "SBSBS BSB", next: "SMALL", n: "2,0" },
+        { pattern: "BSSSB", next: "BIG", n: "6,9" }, { pattern: "SBBBS", next: "SMALL", n: "0,3" },
+        { pattern: "BBSBB", next: "SMALL", n: "1,4" }, { pattern: "SSBSS", next: "BIG", n: "8,5" },
+        { pattern: "BSSBS", next: "BIG", n: "7,9" }, { pattern: "SBB SB", next: "SMALL", n: "2,0" },
+        { pattern: "BBBS S", next: "SMALL", n: "1,3" }, { pattern: "SSSB B", next: "BIG", n: "6,8" },
+        { pattern: "BSBBS", next: "BIG", n: "5,7" }, { pattern: "SBBSSB", next: "SMALL", n: "4,1" },
+        { pattern: "BBSBSS", next: "BIG", n: "9,8" }, { pattern: "SSBSBB", next: "SMALL", n: "2,3" },
+        { pattern: "BBSSSB", next: "BIG", n: "7,6" }, { pattern: "SSBBBS", next: "SMALL", n: "0,1" },
+        { pattern: "BSBBBS", next: "BIG", n: "8,5" }, { pattern: "SBSSSB", next: "SMALL", n: "4,2" },
+        { pattern: "BBSSBBSSBB", next: "SMALL", n: "0,3" }, { pattern: "SSBBSSBBSS", next: "BIG", n: "9,7" },
+        { pattern: "BBSBSBSBBS", next: "BIG", n: "8,6" }, { pattern: "SSBSBSBSSB", next: "SMALL", n: "1,2" },
+        { pattern: "BBBBBSBBBB", next: "SMALL", n: "4,0" }, { pattern: "SSSSSBSSSS", next: "BIG", n: "5,9" },
+        { pattern: "BSBBSBBSBB", next: "SMALL", n: "2,1" }, { pattern: "SBSBSB SBSB", next: "BIG", n: "7,8" },
+        { pattern: "BBBS BBBS BB", next: "SMALL", n: "0,4" }, { pattern: "SSSB SSSB SS", next: "BIG", n: "9,6" },
+        { pattern: "BSSS BSSS BS", next: "BIG", n: "7,5" }, { pattern: "SBBB SBBB SB", next: "SMALL", n: "3,1" },
+        { pattern: "BB SS BB SS BB", next: "SMALL", n: "1,2" }, { pattern: "SS BB SS BB SS", next: "BIG", n: "8,9" },
+        { pattern: "BS SS BB SB SB", next: "BIG", n: "6,7" }, { pattern: "SB BB SS BS BS", next: "SMALL", n: "0,4" },
+        { pattern: "B B B S S S B B", next: "SMALL", n: "2,3" }, { pattern: "S S S B B B S S", next: "BIG", n: "9,5" },
+        { pattern: "BSB SBB SBS", next: "BIG", n: "7,8" }, { pattern: "SBS BSS BSB", next: "SMALL", n: "1,0" }
+    ];
+
+    let inputs = [];
+    let currentPrediction = "";
+    let currentNums = "";
+    
+    // WIN/LOSS 唳侧唳班唳ㄠ唳� 唳∴唳熰唳唳�
+    let aiLearningData = JSON.parse(localStorage.getItem('ai_learning_pro_v10')) || [];
+
+    function checkLogin() {
+        if(document.getElementById('passInput').value === "8899") {
+            document.getElementById('loginScreen').style.display = "none";
+            document.getElementById('mainApp').style.display = "block";
+        } else { alert("唳唳� 唳唳膏唰熰唳班唳�!"); }
+    }
+
+    function addNum(n) {
+        if (inputs.length < 10) {
+            inputs.push((n >= 5 ? 'B' : 'S') + '-' + n);
+            updateUI();
+        }
+    }
+
+    function deleteLast() { inputs.pop(); updateUI(); }
+
+    function updateUI() {
+        document.getElementById('patternDisplay').innerText = inputs.length === 0 ? "唳呧Κ唰囙唰嵿Ψ唳� 唳曕Π唳涏..." : inputs.join(' | ');
+        document.getElementById('counter').innerText = `Input (${inputs.length}/10)`;
+    }
+
+    function startProcess() {
+        if (inputs.length < 10) { alert("唳︵唳� 唳曕Π唰� 唰оЕ唳熰 唳唳班唰熰Α 唳囙Θ唳唳� 唳︵唳�!"); return; }
+        const pInput = document.getElementById('periodInput').value;
+        if (!pInput) { alert("唳唳班唰熰Α 唳ㄠΞ唰嵿Μ唳� 唳︵唳�!"); return; }
+
+        document.getElementById('searchLoader').style.display = "block";
+        document.getElementById('floatingOverlay').style.display = "none";
+
+        setTimeout(() => {
+            document.getElementById('searchLoader').style.display = "none";
+            deepAnalysis();
+        }, 3000);
+    }
+
+    function deepAnalysis() {
+        const patternKey = inputs.map(i => i.split('-')[0]).join('');
+        let prediction = "";
+        let numSig = "";
+
+        // 唰�. 唳夃唳�/唳侧Ω 唳灌唳膏唳熰唳班 唳唳唳氞唳� (AI Learning)
+        let historyMatch = aiLearningData.find(h => h.pattern === patternKey && h.status === 'WIN');
+
+        // 唰�. 唳唳囙Θ 唳∴唳熰唳唳� 唳唳唳氞唳�
+        let dbMatch = MASTER_DB.find(d => patternKey.includes(d.pattern));
+
+        if (historyMatch) {
+            prediction = historyMatch.predict;
+            numSig = (prediction === "BIG") ? "7,9" : "0,2";
+        } else if (dbMatch) {
+            prediction = dbMatch.next;
+            numSig = dbMatch.n;
+        } else {
+            // 唰�. 唳唳班-唳侧唳唳� 唳熰唳班唳ㄠ唳� 唳忇Θ唳距Σ唳距唳膏唳� (唳Ζ唳� 唳唳唳� 唳ㄠ 唳ム唳曕)
+            let bCount = inputs.filter(x => x.startsWith('B')).length;
+            prediction = (bCount >= 5) ? "SMALL" : "BIG"; // Trend reversal logic
+            numSig = (prediction === "BIG") ? "7,5" : "0,4";
+        }
+
+        currentPrediction = prediction;
+        currentNums = numSig;
+
+        const resDisp = document.getElementById('floatPred');
+        resDisp.innerText = prediction;
+        resDisp.style.color = prediction === "BIG" ? "#ff4d4d" : "#00d2ff";
+        
+        document.getElementById('floatNums').innerText = numSig;
+        document.getElementById('floatingOverlay').style.display = "block";
+    }
+
+    function record(status) {
+        const period = document.getElementById('periodInput').value || "---";
+        const patternKey = inputs.map(i => i.split('-')[0]).join('');
+
+        // 唳∴唳熰唳唳溹 唳侧唳班唳ㄠ唳� 唳∴唳熰 唳唳� 唳曕Π唳�
+        aiLearningData.push({
+            pattern: patternKey,
+            predict: currentPrediction,
+            status: status
+        });
+        localStorage.setItem('ai_learning_pro_v10', JSON.stringify(aiLearningData));
+
+        const row = `<tr><td>${period}</td><td style="color:${currentPrediction==='BIG'?'#ff4d4d':'#00d2ff'}; font-weight:bold;">${currentPrediction} (${currentNums})</td><td style="color:${status==='WIN'?'#2ecc71':'#e74c3c'}; font-weight:bold;">${status}</td></tr>`;
+        document.getElementById('historyBody').innerHTML = row + document.getElementById('historyBody').innerHTML;
+        
+        document.getElementById('floatingOverlay').style.display = "none";
+        inputs = []; 
+        updateUI();
+        document.getElementById('periodInput').value = "";
+    }
+</script>
 </body>
-</html>
+                                                                        </html>
+
