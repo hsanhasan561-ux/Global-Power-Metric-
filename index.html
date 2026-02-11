@@ -42,14 +42,14 @@
 
 <div id="loginScreen">
     <div class="login-box">
-        <h2 style="color: var(--accent); margin-bottom: 20px;">🔐 VIP AI SQL LOGIN</h2>
+        <h2 style="color: var(--accent); margin-bottom: 20px;">🔐najmul VIP AI SQL LOGIN</h2>
         <input type="password" id="passInput" placeholder="Enter Password">
         <button class="btn-get" onclick="checkLogin()">LOGIN NOW</button>
     </div>
 </div>
 
 <div id="mainApp">
-    <h2 style="color: var(--accent); margin: 0 0 5px 0; letter-spacing: 1px;">🔥 BD MASTER AI V10 SQL</h2>
+    <h2 style="color: var(--accent); margin: 0 0 5px 0; letter-spacing: 1px;">🔥najmul pro MASTER AI V10 SQL</h2>
     
     <div class="social-btn">
         <a href="https://t.me/yourtelegram" class="tg-link">JOIN TELEGRAM</a>
@@ -126,6 +126,153 @@
         const tx = db.transaction(STORE_NAME, "readwrite");
         const store = tx.objectStore(STORE_NAME);
         const MASTER_LIST = [
+              // ৩০টি ছবির ডাটা বিশ্লেষণ অনুযায়ী ১ সংখ্যার প্যাটার্ন
+    { pattern: "B", next: "S" }, // Big আসলে পরবর্তী Small হওয়ার সম্ভাবনা
+    { pattern: "S", next: "B" }, // Small আসলে পরবর্তী Big হওয়ার সম্ভাবনা
+    { pattern: "B", next: "B" }, // Big এর পর Big (Trend ফলো করলে)
+    { pattern: "S", next: "S" },  // Small এর পর Small (Trend ফলো করলে)
+            // ছবির ডাটা অনুযায়ী ২ সংখ্যার প্যাটার্ন
+    { pattern: "BB", next: "B" }, 
+    { pattern: "BB", next: "S" },
+    { pattern: "SS", next: "S" }, 
+    { pattern: "SS", next: "B" },
+    { pattern: "BS", next: "S" }, 
+    { pattern: "BS", next: "B" },
+    { pattern: "SB", next: "B" }, 
+    { pattern: "SB", next: "S" },
+    
+    // ছবির গভীর বিশ্লেষণ থেকে আরও কিছু কম্বিনেশন
+    { pattern: "BB", next: "S" }, 
+    { pattern: "SS", next: "B" },
+    { pattern: "BS", next: "B" }, 
+    { pattern: "SB", next: "S" },
+        // --- ৩ অক্ষরের প্যাটার্ন (ছবি থেকে নেওয়া) ---
+    { pattern: "BBB", next: "S" },
+    { pattern: "BBS", next: "S" },
+    { pattern: "BSB", next: "S" },
+    { pattern: "BSS", next: "B" },
+    { pattern: "SBB", next: "S" },
+    { pattern: "SBS", next: "B" },
+    { pattern: "SSB", next: "B" },
+    { pattern: "SSS", next: "B" },
+
+    // --- ৪ অক্ষরের প্যাটার্ন (ছবি থেকে নেওয়া) ---
+    { pattern: "BBBB", next: "S" },
+    { pattern: "BBBS", next: "S" },
+    { pattern: "BBSS", next: "B" },
+    { pattern: "BSSS", next: "B" },
+    { pattern: "SSSS", next: "B" },
+    { pattern: "SSSB", next: "B" },
+    { pattern: "SSBB", next: "S" },
+    { pattern: "SBBB", next: "S" },
+    { pattern: "BSBS", next: "S" },
+    { pattern: "SBSB", next: "B" },
+    { pattern: "BSSB", next: "S" },
+    { pattern: "SBBS", next: "B" },
+    // --- ৩ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BBB", next: "S" },
+    { pattern: "SSS", next: "B" },
+    { pattern: "BBS", next: "B" },
+    { pattern: "SSB", next: "S" },
+    { pattern: "BSB", next: "B" },
+    { pattern: "SBS", next: "S" },
+    { pattern: "BSS", next: "S" },
+    { pattern: "SBB", next: "B" },
+    { pattern: "SSB", next: "B" },
+    { pattern: "BBS", next: "S" },
+
+    // --- ৪ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BBBB", next: "S" },
+    { pattern: "SSSS", next: "B" },
+    { pattern: "BBSS", next: "B" },
+    { pattern: "SSBB", next: "S" },
+    { pattern: "BSBS", next: "B" },
+    { pattern: "SBSB", next: "S" },
+    { pattern: "BSSB", next: "B" },
+    { pattern: "SBBS", next: "S" },
+    { pattern: "BSSS", next: "B" },
+    { pattern: "SBBB", next: "S" },
+    { pattern: "SSBS", next: "B" },
+    { pattern: "BBBS", next: "S" },
+        // --- ২ সংখ্যার প্যাটার্ন (Short Trend) ---
+    { pattern: "BB", next: "S" },
+    { pattern: "SS", next: "B" },
+    { pattern: "BS", next: "B" },
+    { pattern: "SB", next: "S" },
+    { pattern: "BB", next: "B" },
+    { pattern: "SS", next: "S" },
+
+    // --- ৩ সংখ্যার প্যাটার্ন (Regular Trend) ---
+    { pattern: "BBB", next: "S" },
+    { pattern: "SSS", next: "B" },
+    { pattern: "BBS", next: "B" },
+    { pattern: "SSB", next: "S" },
+    { pattern: "BSB", next: "S" },
+    { pattern: "SBS", next: "B" },
+    { pattern: "BSS", next: "B" },
+    { pattern: "SBB", next: "S" },
+    { pattern: "BSB", next: "B" },
+    { pattern: "SBS", next: "S" },
+    { pattern: "SSB", next: "B" },
+    { pattern: "BBS", next: "S" },
+    // --- ৩ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BSB", next: "S" },
+    { pattern: "SBS", next: "B" },
+    { pattern: "BBS", next: "S" },
+    { pattern: "SSB", next: "B" },
+    { pattern: "BSS", next: "B" },
+    { pattern: "SBB", next: "S" },
+
+    // --- ৪ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BSBS", next: "S" },
+    { pattern: "SBSB", next: "B" },
+    { pattern: "BBSS", next: "B" },
+    { pattern: "SSBB", next: "S" },
+    { pattern: "BSSB", next: "S" },
+    { pattern: "SBBS", next: "B" },
+
+    // --- ৫ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BSBSB", next: "S" },
+    { pattern: "SBSBS", next: "B" },
+    { pattern: "BBBBB", next: "S" },
+    { pattern: "SSSSS", next: "B" },
+    { pattern: "BSSBB", next: "S" },
+    { pattern: "SBBSS", next: "B" },
+
+    // --- ৬ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BSBSBS", next: "S" },
+    { pattern: "SBSBSB", next: "B" },
+    { pattern: "BBSSBB", next: "S" },
+    { pattern: "SSBBSS", next: "B" },
+    { pattern: "BSSBSS", next: "B" },
+    { pattern: "SBB SBB", next: "S" },
+     // --- ৫ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BBBBB", next: "S" },
+    { pattern: "SSSSS", next: "B" },
+    { pattern: "BBBBS", next: "S" },
+    { pattern: "SSSSB", next: "B" },
+    { pattern: "BBSSB", next: "S" },
+    { pattern: "SSBBS", next: "B" },
+    { pattern: "BSBSB", next: "S" },
+    { pattern: "SBSBS", next: "B" },
+    { pattern: "BSSBB", next: "S" },
+    { pattern: "SBBSS", next: "B" },
+    { pattern: "BSBSS", next: "B" },
+    { pattern: "SBSBB", next: "S" },
+
+    // --- ৬ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
+    { pattern: "BBBBBB", next: "S" },
+    { pattern: "SSSSSS", next: "B" },
+    { pattern: "BBSSBB", next: "S" },
+    { pattern: "SSBBSS", next: "B" },
+    { pattern: "BSBSBS", next: "S" },
+    { pattern: "SBSBSB", next: "B" },
+    { pattern: "BSSBSS", next: "B" },
+    { pattern: "SBB SBB", next: "S" },
+    { pattern: "BBBSSS", next: "B" },
+    { pattern: "SSSBBB", next: "S" },
+    { pattern: "BBSBBS", next: "S" },
+    { pattern: "SSBSSB", next: "B" },
             { pattern: "BBBBBBBBBB", next: "S" },
             { pattern: "SSSSSSSSSS", next: "B" },
             { pattern: "BSBSBSBSBS", next: "S" },
@@ -281,7 +428,7 @@
         { pattern: "SSSBBBSBSB", next: "B" },
         { pattern: "BBSBSSBBSB", next: "B" },
         { pattern: "SSBSBBSBBS", next: "S" }
- // ---
+
         ];
         MASTER_LIST.forEach(p => store.put(p));
     }
