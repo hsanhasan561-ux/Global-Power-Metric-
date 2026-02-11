@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAJMUL Master AI V10 PRO</title>
+    <title>BD MASTER AI V10 PRO</title>
     <style>
         :root { --primary-bg: #040608; --panel-bg: #0d1117; --accent: #00FFCC; --delete-red: #ff4d4d; }
         body { background-color: var(--primary-bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
@@ -202,6 +202,86 @@
         { pattern: "SSSBBBSBSB", next: "B" },
         { pattern: "BBSBSSBBSB", next: "B" },
         { pattern: "SSBSBBSBBS", next: "S" },
+            { pattern: "BBB", next: "S" },
+        { pattern: "BBS", next: "S" },
+        { pattern: "BSB", next: "S" },
+        { pattern: "BSS", next: "B" },
+        { pattern: "SBB", next: "S" },
+        { pattern: "SBS", next: "B" },
+        { pattern: "SSB", next: "B" },
+        { pattern: "SSS", next: "B" },
+
+        // --- ৪ অক্ষরের প্যাটার্ন ---
+        { pattern: "BBBB", next: "S" },
+        { pattern: "BBSS", next: "B" },
+        { pattern: "BSBS", next: "S" },
+        { pattern: "SBBB", next: "B" },
+        { pattern: "SBSB", next: "B" },
+        { pattern: "SSBB", next: "S" },
+        { pattern: "SSSS", next: "B" },
+
+        // --- ৫ অক্ষরের প্যাটার্ন ---
+        { pattern: "BBBBB", next: "S" },
+        { pattern: "SSSSS", next: "B" },
+        { pattern: "BSBSB", next: "S" },
+        { pattern: "SBSBS", next: "B" },
+
+        // --- ১০ অক্ষরের প্যাটার্ন (ছবি ও নোটবুক থেকে সংগৃহীত) ---
+        { pattern: "BBBBBBBBBB", next: "S" },
+        { pattern: "SSSSSSSSSS", next: "B" },
+        { pattern: "BSBSBSBSBS", next: "S" },
+        { pattern: "SBSBSBSBSB", next: "B" },
+        { pattern: "SSSSSBBBBB", next: "S" },
+        { pattern: "SSSSBBBBBS", next: "S" },
+        { pattern: "SSSBBBBSSB", next: "B" },
+        { pattern: "SSBBBBSSBS", next: "S" },
+        { pattern: "SBBBBSSBSB", next: "B" }, 
+        { pattern: "BBBBSSBSBB", next: "S" },
+        { pattern: "BBBSSBSBBS", next: "S" }, 
+        { pattern: "BBSSBSBBSS", next: "S" },
+        { pattern: "BSSBSBBSSB", next: "B" },
+        { pattern: "SSBSBBSSBS", next: "B" },
+        { pattern: "SBSBBSSBSB", next: "S" },
+        { pattern: "BSBBSSBSBB", next: "B" },
+        { pattern: "SBBSSBSBBS", next: "B" }, 
+        { pattern: "BSSBSBBSSS", next: "B" }, 
+        { pattern: "SSBSBBSSSS", next: "B" },
+        { pattern: "SBSBBSSSSS", next: "B" }, 
+        { pattern: "BBSSBBSBSB", next: "S" }, 
+        { pattern: "BSSBBSBSBS", next: "B" },
+        { pattern: "SSBBSBSBSB", next: "S" },
+        { pattern: "SBBSBSBSBS", next: "B" },
+        { pattern: "BBSBSBSBSB", next: "S" },
+        { pattern: "BSBSBSBSBB", next: "S" },
+        { pattern: "SBSBSBSBBS", next: "B" },
+        { pattern: "BSBSBSBBSS", next: "B" },
+        { pattern: "SBSBSBBSSS", next: "S" }, 
+        { pattern: "BSBSBBSSSS", next: "S" },
+        { pattern: "BSSBBSSBBS", next: "S" },
+        { pattern: "SSBBSSBBSB", next: "B" },
+        { pattern: "SBBSSBBSBB", next: "S" }, 
+        { pattern: "BBSSBBSBBS", next: "B" },
+        { pattern: "BSSBBSBBSB", next: "S" }, 
+        { pattern: "SSBBSBBSBB", next: "S" },
+        { pattern: "SBBSBBSBBS", next: "B" }, 
+        { pattern: "BBSBBSBBSB", next: "B" },
+        { pattern: "BSBBSBBSBS", next: "S" }, 
+        { pattern: "SBBSBBSBSB", next: "B" },
+        { pattern: "BBSBBSBSBB", next: "S" }, 
+        { pattern: "BSBBSBSBBS", next: "S" },
+        { pattern: "BSBSBSSBSB", next: "B" },
+        { pattern: "SBSBBSBBSB", next: "S" },
+        { pattern: "BSSBSSBSSB", next: "B" }, 
+        { pattern: "SBBSSBBSSB", next: "S" },
+        { pattern: "BBBBSBBBBS", next: "B" },
+        { pattern: "SSSSBSSSSB", next: "S" },
+        { pattern: "BBSSBBSSBB", next: "S" }, 
+        { pattern: "SSBBSSBBSS", next: "B" },
+        { pattern: "BBBSSSBBSB", next: "S" }, 
+        { pattern: "SSSBBBSBSB", next: "B" },
+        { pattern: "BBSBSSBBSB", next: "B" },
+        { pattern: "SSBSBBSBBS", next: "S" }
+ // ---
         ];
         MASTER_LIST.forEach(p => store.put(p));
     }
