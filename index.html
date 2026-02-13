@@ -75,12 +75,19 @@
     <div id="patternDisplay">আগের ১০টি রেজাল্ট ইনপুট দিন</div>
 
     <input type="number" id="periodInput" placeholder="এখানে পিরিয়ড নম্বর লিখুন">
-    <button class="btn-get" onclick="startProcess()">🚀 GET PRO SIGNAL</button>
-<div style="display: flex; flex-direction: column; gap: 20px; padding: 15px; margin-top: 10px;">
+<div style="display: flex; flex-direction: column; gap: 15px; padding: 15px; margin-top: 10px;">
 
-    <button onclick="runAIModel()" style="width: 100%; padding: 18px; background: #00e5ff; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,229,255,0.3);">
+    <button onclick="runAIModel()" style="width: 100%; padding: 18px; background: #00e5ff; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
        🚀 GET PRO SIGNAL
     </button>
+
+    <button onclick="openGame()" style="width: 100%; padding: 18px; background: #00FFCC; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
+       🚀 OPEN DK WIN & START AUTO-SCAN
+    </button>
+
+</div>
+    
+
 
     <button onclick="openGame()" style="width: 100%; padding: 18px; background: #00FFCC; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,255,204,0.3);">
        🚀 OPEN DK WIN & START AUTO-SCAN
@@ -712,32 +719,59 @@
         refreshUI();
         document.getElementById('periodInput').value = "";
     }
-    // ১. গেম ওপেন করার ফাংশন
+// ==========================================
+// ১. গেম ওপেন করার ফাংশন
+// ==========================================
 function openGame() {
-    // এখানে DK Win সাইটের সঠিক লিঙ্কটি দিন
-    window.open("https://dkwin9.com/#/saasLottery", "_blank");
-    alert("DK Win ওপেন হয়েছে! এখন গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
+    // এখানে DK Win সাইটের লিঙ্কটি দেওয়া হয়েছে
+    const gameUrl = "https://dkwin9.com/#/saasLottery";
+    window.open(gameUrl, "_blank");
+    alert("গেম ওপেন হয়েছে! এবার গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
 }
 
-// ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ করার লজিক
+// ==========================================
+// ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ এবং আপডেট লজিক
+// ==========================================
 window.addEventListener("message", (event) => {
+    // শুধুমাত্র 'AUTO_INPUT' টাইপের ডাটা গ্রহণ করবে
     if (event.data && event.data.type === 'AUTO_INPUT') {
         let detectedSize = event.data.data;
         
-        // একই ডাটা বারবার আসা বন্ধ করতে চেক
-        if (inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) return;
+        // একই ডাটা (Duplicate) বারবার আসা বন্ধ করতে চেক
+        if (typeof inputs !== 'undefined' && inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) {
+            console.log("Duplicate ignored: " + detectedSize);
+            return;
+        }
 
-        if (inputs.length >= 10) inputs.shift();
-        inputs.push({ t: detectedSize });
+        // ইনপুট লিস্টে ডাটা যোগ করা (সর্বোচ্চ ১০টি)
+        if (typeof inputs !== 'undefined') {
+            if (inputs.length >= 10) {
+                inputs.shift();
+            }
+            inputs.push({ t: detectedSize });
+        }
         
-        console.log("Auto-Input Received: " + detectedSize);
+        console.log("✅ Auto-Input Received: " + detectedSize);
         
-        // ডাটা পাওয়ার সাথে সাথে আপনার ১১-ব্রেন মডেল রান হবে
+        // --- স্ক্রিনের ডিসপ্লে আপডেট করার অংশ ---
+        if (typeof refreshUI === "function") {
+            refreshUI(); 
+        } else if (typeof renderInputs === "function") {
+            renderInputs(); // আপনার কোডে যদি renderInputs থাকে
+        } else {
+            const container = document.getElementById('inputContainer') || document.getElementById('inputs');
+            if (container && typeof inputs !== 'undefined') {
+                container.innerHTML = inputs.map(i => `<span>${i.t}</span>`).join(' , ');
+            }
+        }
+
+        // ডাটা পাওয়ার সাথে সাথে AI মডেল রান করে সিগন্যাল তৈরি করবে
         if (typeof runAIModel === "function") {
             runAIModel();
         }
     }
 }, false);
+    
 </script>
 </body>
 </html>
