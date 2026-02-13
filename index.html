@@ -586,7 +586,18 @@
         document.getElementById('searchLoader').style.display = "block";
         setTimeout(runAIModel, 1500);
     }
-        async function runAIModel() {
+async function runAIModel() {
+    // চেক করবে ১০টি ইনপুট পূর্ণ হয়েছে কি না
+    if (inputs.length < 10) {
+        alert("দয়া করে অটো-স্ক্যানারের মাধ্যমে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
+        return; // চেক সফল না হলে এখানে কোড থেমে যাবে
+    }
+
+    // ১০টি ইনপুট থাকলে তবেই নিচের পপ-আপ কল হবে
+    showPredictionPopup(); 
+}
+    
+        {
         document.getElementById('searchLoader').style.display = "none";
         currentPatternKey = inputs.map(i => i.t).join('');
         
@@ -726,45 +737,50 @@ function openGame() {
 // ==========================================
 // ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ এবং আপডেট লজিক
 // ==========================================
+// ==========================================
+// ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ এবং আপডেট লজিক
+// ==========================================
 window.addEventListener("message", (event) => {
-    // শুধুমাত্র 'AUTO_INPUT' টাইপের ডাটা গ্রহণ করবে
     if (event.data && event.data.type === 'AUTO_INPUT') {
         let detectedSize = event.data.data;
         
-        // একই ডাটা (Duplicate) বারবার আসা বন্ধ করতে চেক
+        // ডুপ্লিকেট ডাটা চেক
         if (typeof inputs !== 'undefined' && inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) {
             console.log("Duplicate ignored: " + detectedSize);
             return;
         }
 
-        // ইনপুট লিস্টে ডাটা যোগ করা (সর্বোচ্চ ১০টি)
+        // ইনপুট লিস্টে ডাটা যোগ করা
         if (typeof inputs !== 'undefined') {
-            if (inputs.length >= 10) {
-                inputs.shift();
-            }
+            if (inputs.length >= 10) inputs.shift();
             inputs.push({ t: detectedSize });
         }
         
         console.log("✅ Auto-Input Received: " + detectedSize);
         
-        // --- স্ক্রিনের ডিসপ্লে আপডেট করার অংশ ---
-        if (typeof refreshUI === "function") {
-            refreshUI(); 
-        } else if (typeof renderInputs === "function") {
-            renderInputs(); // আপনার কোডে যদি renderInputs থাকে
-        } else {
-            const container = document.getElementById('inputContainer') || document.getElementById('inputs');
-            if (container && typeof inputs !== 'undefined') {
-                container.innerHTML = inputs.map(i => `<span>${i.t}</span>`).join(' , ');
-            }
+        // ==========================================
+        // ৩. সরাসরি আপনার স্ক্রিন আপডেট করার লজিক (ভুল সংশোধন)
+        // ==========================================
+        
+        // কাউন্টার আপডেট (Input 0/10 থেকে সংখ্যা বাড়ানো)
+        const counterEl = document.getElementById('counter');
+        if (counterEl) {
+            counterEl.innerText = `Input (${inputs.length}/10)`;
         }
 
-        // ডাটা পাওয়ার সাথে সাথে AI মডেল রান করে সিগন্যাল তৈরি করবে
+        // প্যাটার্ন ডিসপ্লে আপডেট (রেজাল্ট বক্সের লেখা পরিবর্তন)
+        const displayEl = document.getElementById('patternDisplay');
+        if (displayEl) {
+            displayEl.innerText = inputs.map(i => i.t).join(', ');
+        }
+
+        // ডাটা পাওয়ার সাথে সাথে অটো মডেল রান করা
         if (typeof runAIModel === "function") {
             runAIModel();
         }
     }
 }, false);
+
     
 </script>
 </body>
