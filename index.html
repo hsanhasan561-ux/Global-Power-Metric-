@@ -586,110 +586,107 @@
         document.getElementById('searchLoader').style.display = "block";
         setTimeout(runAIModel, 1500);
     }
-async function runAIModel() {
-    // চেক করবে ১০টি ইনপুট পূর্ণ হয়েছে কি না
-    if (inputs.length < 10) {
-        alert("দয়া করে অটো-স্ক্যানারের মাধ্যমে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
-        return; 
-    }
+    // আপনার আগের গ্লোবাল ভেরিয়েবলগুলো (যেমন inputs, wallet, mStep ইত্যাদি) এখানে থাকবে
 
-    // লোডার দেখানো
-    if(document.getElementById('searchLoader')) document.getElementById('searchLoader').style.display = "block";
-
-    currentPatternKey = inputs.map(i => i.t).join('');
-    
-    let prediction = ""; 
-    let modeHTML = "";
-    let confidence = 93;
-
-    // --- ব্রেন ১-৪: মেমোরি ও রেশিও লেয়ার ---
-    let head1 = currentPatternKey[0]; 
-    let head2 = currentPatternKey[1];
-    
-    if (head1 === head2) {
-        prediction = head1;
-        modeHTML = `<span style="color: #00FFCC;">HEAD TREND</span>`;
-    } else {
-        let match = await new Promise((res) => {
-            const req = db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).get(currentPatternKey);
-            req.onsuccess = () => res(req.result);
-        });
-        if (match) {
-            prediction = match.next;
-            modeHTML = `<span style="color: #FFD700;">MEMORY MATCH</span>`;
-            confidence = 98;
-        } else {
-            let bCount = inputs.filter(i => i.t === 'B').length;
-            prediction = bCount >= 5 ? "B" : "S";
-            modeHTML = `<span style="color: #00FFCC;">AUTO-GEN</span>`;
+    async function runAIModel() {
+        // ১. ইনপুট চেক
+        if (inputs.length < 10) {
+            alert("দয়া করে অটো-স্ক্যানারের মাধ্যমে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
+            return; 
         }
-    }
 
-    // --- ব্রেন ৫: আল্ট্রা ড্রাগন ফলো ---
-    let lastNine = currentPatternKey.slice(-9);
-    if (lastNine === "BBBBBBBBB" || lastNine === "SSSSSSSSS") {
-        prediction = lastNine[0];
-        modeHTML = `<span style="color: #00FFCC;">ULTRA DRAGON (9X)</span>`;
-        confidence = 100;
-    }
+        // ২. লোডার দেখানো
+        const loader = document.getElementById('searchLoader');
+        if(loader) loader.style.display = "block";
 
-    // --- ব্রেন ৬: জিক-জ্যাক ডিটেকশন ---
-    let lastFour = currentPatternKey.slice(-4);
-    if (lastFour === "BSBS" || lastFour === "SBSB") {
-        prediction = (lastFour[3] === "B") ? "S" : "B"; 
-        modeHTML = `<span style="color: #BB86FC;">ZIG-ZAG DETECTED</span>`;
-    }
-
-    // --- ব্রেন ৭: মিরর রিপিট (সংশোধিত SBBs -> SBBS) ---
-    if (lastFour === "BSSB" || lastFour === "SBBS") {
-        prediction = (lastFour[3] === "B") ? "B" : "S"; 
-        modeHTML = `<span style="color: #0080FF;">MIRROR REPEAT</span>`;
-    }
-
-    // --- ব্রেন ৯: মার্কেট ট্র্যাপ ডিটেক্টর ---
-    if (typeof losses !== 'undefined' && losses >= 2 && mStep >= 2) {
-        prediction = (prediction === "B") ? "S" : "B"; 
-        modeHTML = `<span style="color: #FF9800;">TRAP DETECTED - REVERSING</span>`;
-    }
-
-    // --- ব্রেন ১১: মেন্টর প্রোটেকশন (৬ লস হলে) ---
-    if (mStep >= 6) {
-        document.getElementById('floatNums').innerText = "WAIT 5 MIN";
-        document.getElementById('aiMode').innerHTML = `<span style="color: #FF1744; font-weight:bold;">MENTOR: 6 LOSSES! STOP</span>`;
-        document.getElementById('floatPred').innerText = "REST";
-        document.getElementById('floatingOverlay').style.display = "block";
-        if(document.getElementById('searchLoader')) document.getElementById('searchLoader').style.display = "none";
-        return; 
-    }
-
-    // --- পপ-আপে রেজাল্ট দেখানো (এটি যোগ করা হয়েছে) ---
-    if(document.getElementById('searchLoader')) document.getElementById('searchLoader').style.display = "none";
-    
-    document.getElementById('floatPred').innerText = prediction === "B" ? "BIG" : "SMALL";
-    document.getElementById('floatPred').style.color = prediction === "B" ? "#ffca28" : "#af7ac5";
-    document.getElementById('aiMode').innerHTML = modeHTML;
-    document.getElementById('floatingOverlay').style.display = "block";
-        }
+        currentPatternKey = inputs.map(i => i.t).join('');
         
-            
-        // আউটপুট প্রসেসিং (বাকি অংশ আগের মতোই থাকবে)
+        let prediction = ""; 
+        let modeHTML = "";
+        let confidence = 93;
+
+        // --- ব্রেন ১-৪: মেমোরি ও রেশিও লেয়ার ---
+        let head1 = currentPatternKey[0]; 
+        let head2 = currentPatternKey[1];
+        
+        if (head1 === head2) {
+            prediction = head1;
+            modeHTML = `<span style="color: #00FFCC;">HEAD TREND</span>`;
+        } else {
+            let match = await new Promise((res) => {
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.get(currentPatternKey);
+                req.onsuccess = () => res(req.result);
+                req.onerror = () => res(null);
+            });
+            if (match) {
+                prediction = match.next;
+                modeHTML = `<span style="color: #FFD700;">MEMORY MATCH</span>`;
+                confidence = 98;
+            } else {
+                let bCount = inputs.filter(i => i.t === 'B').length;
+                prediction = bCount >= 5 ? "B" : "S";
+                modeHTML = `<span style="color: #00FFCC;">AUTO-GEN</span>`;
+            }
+        }
+
+        // --- ব্রেন ৫-১০: জিক-জ্যাক, ড্রাগন ও ট্র্যাপ ডিটেকশন ---
+        let lastNine = currentPatternKey.slice(-9);
+        if (lastNine === "BBBBBBBBB" || lastNine === "SSSSSSSSS") {
+            prediction = lastNine[0];
+            modeHTML = `<span style="color: #00FFCC;">ULTRA DRAGON (9X)</span>`;
+            confidence = 100;
+        }
+
+        let lastFour = currentPatternKey.slice(-4);
+        if (lastFour === "BSBS" || lastFour === "SBSB") {
+            prediction = (lastFour[3] === "B") ? "S" : "B"; 
+            modeHTML = `<span style="color: #BB86FC;">ZIG-ZAG DETECTED</span>`;
+        }
+
+        if (lastFour === "BSSB" || lastFour === "SBBS") {
+            prediction = (lastFour[3] === "B") ? "B" : "S"; 
+            modeHTML = `<span style="color: #0080FF;">MIRROR REPEAT</span>`;
+        }
+
+        if (typeof losses !== 'undefined' && losses >= 2 && mStep >= 2) {
+            prediction = (prediction === "B") ? "S" : "B"; 
+            modeHTML = `<span style="color: #FF9800;">TRAP DETECTED</span>`;
+        }
+
+        // --- ব্রেন ১১: মেন্টর প্রোটেকশন (৬ লস হলে) ---
+        if (mStep >= 6) {
+            document.getElementById('floatNums').innerText = "WAIT 5 MIN";
+            document.getElementById('aiMode').innerHTML = `<span style="color: #FF1744; font-weight:bold;">MENTOR: STOP</span>`;
+            document.getElementById('floatPred').innerText = "REST";
+            document.getElementById('floatingOverlay').style.display = "block";
+            if(loader) loader.style.display = "none";
+            return; 
+        }
+
+        // --- ৩. আউটপুট প্রসেসিং ---
+        if(loader) loader.style.display = "none";
+        
         currentPrediction = (prediction === "B") ? "BIG" : "SMALL";
         let pNums = (prediction === "B") ? [9,8,7,6,5] : [4,3,2,1,0];
         currentNumbers = pNums.sort(() => Math.random() - 0.5).slice(0,3).join(',');
 
+        // UI আপডেট
         document.getElementById('aiMode').innerHTML = modeHTML;
         document.getElementById('floatPred').innerText = currentPrediction;
         document.getElementById('floatPred').style.color = (prediction === "B") ? "#00FFCC" : "#ff4d4d";
-        
-        // এখানেও floatNums আপডেট করে দিলাম যেন সাধারণ সময় নম্বর দেখায়
         document.getElementById('floatNums').innerText = "(" + currentNumbers + ")";
-        
         document.getElementById('winRateDisp').innerText = "ACCURACY: " + (confidence + (new Date().getSeconds() % 3)) + "%";
-        document.getElementById('aiBetInfo').innerText = "BET AMOUNT: " + Math.floor((wallet * 2 / 100) * Math.pow(2, mStep));
+        
+        // বেট ক্যালকুলেশন
+        let betAmount = Math.floor((wallet * 2 / 100) * Math.pow(2, mStep));
+        document.getElementById('aiBetInfo').innerText = "BET AMOUNT: " + betAmount;
+        
         document.getElementById('floatingOverlay').style.display = "block";
-        }   
-            
-    // শর্ত ৮: জিতা বা হারার ডেটা মেমোরিতে সেভ করা
+    }
+
+    // ৪. রেকর্ড সেভ করার ফাংশন
     function record(status) {
         let currentBet = Math.floor((wallet * 2 / 100) * Math.pow(2, mStep));
         let predT = (currentPrediction === "BIG") ? "B" : "S";
@@ -711,54 +708,33 @@ async function runAIModel() {
         inputs = []; 
         document.getElementById('patternDisplay').innerText = "আগের ১০টি রেজাল্ট ইনপুট দিন";
         document.getElementById('counter').innerText = `Input (0/10)`;
-        refreshUI();
+        
+        if(typeof refreshUI === "function") refreshUI();
         document.getElementById('periodInput').value = "";
     }
-        // ১. গেম ওপেন করার ফাংশন
-        function openGame() {
-            const gameUrl = "https://dkwin9.com/#/saasLottery";
-            window.open(gameUrl, "_blank");
-            alert("গেম ওপেন হয়েছে! এবার গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
-        }
 
-        // ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ এবং আপডেট লজিক
-        window.addEventListener("message", (event) => {
-            if (event.data && event.data.type === 'AUTO_INPUT') {
-                let detectedSize = event.data.data;
-                
-                // ডুপ্লিকেট ডাটা চেক
-                if (typeof inputs !== 'undefined' && inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) {
-                    console.log("Duplicate ignored: " + detectedSize);
-                    return;
-                }
+    function openGame() {
+        const gameUrl = "https://dkwin9.com/#/saasLottery";
+        window.open(gameUrl, "_blank");
+        alert("গেম ওপেন হয়েছে! এবার গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
+    }
 
-                // ইনপুট লিস্টে ডাটা যোগ করা
-                if (typeof inputs !== 'undefined') {
-                    if (inputs.length >= 10) inputs.shift();
-                    inputs.push({ t: detectedSize });
-                }
-                
-                console.log("✅ Auto-Input Received: " + detectedSize);
-                
-                // ৩. স্ক্রিন আপডেট লজিক
-                const counterEl = document.getElementById('counter');
-                if (counterEl) {
-                    counterEl.innerText = `Input (${inputs.length}/10)`;
-                }
+    window.addEventListener("message", (event) => {
+        if (event.data && event.data.type === 'AUTO_INPUT') {
+            let detectedSize = event.data.data;
+            if (inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) return;
 
-                const displayEl = document.getElementById('patternDisplay');
-                if (displayEl) {
-                    displayEl.innerText = inputs.map(i => i.t).join(', ');
-                }
+            if (inputs.length >= 10) inputs.shift();
+            inputs.push({ t: detectedSize });
+            
+            document.getElementById('counter').innerText = `Input (${inputs.length}/10)`;
+            document.getElementById('patternDisplay').innerText = inputs.map(i => i.t).join(', ');
 
-                // সিগন্যাল রান করা
-                if (typeof runAIModel === "function") {
-                    runAIModel();
-                }
+            if (inputs.length === 10) {
+                runAIModel();
             }
-        }, false);
-    </script>
+        }
+    }, false);
+</script>
 </body>
-</html>
-
-
+</html
