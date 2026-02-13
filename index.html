@@ -76,7 +76,18 @@
 
     <input type="number" id="periodInput" placeholder="এখানে পিরিয়ড নম্বর লিখুন">
     <button class="btn-get" onclick="startProcess()">🚀 GET PRO SIGNAL</button>
+<div style="display: flex; flex-direction: column; gap: 20px; padding: 15px; margin-top: 10px;">
 
+    <button onclick="runAIModel()" style="width: 100%; padding: 18px; background: #00e5ff; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,229,255,0.3);">
+       🚀 GET PRO SIGNAL
+    </button>
+
+    <button onclick="openGame()" style="width: 100%; padding: 18px; background: #00FFCC; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,255,204,0.3);">
+       🚀 OPEN DK WIN & START AUTO-SCAN
+    </button>
+
+</div>
+    
     <div id="searchLoader" style="display:none; margin:15px 0; color:var(--accent);">SQL ANALYZING...</div>
 
     <div id="floatingOverlay">
@@ -701,6 +712,32 @@
         refreshUI();
         document.getElementById('periodInput').value = "";
     }
+    // ১. গেম ওপেন করার ফাংশন
+function openGame() {
+    // এখানে DK Win সাইটের সঠিক লিঙ্কটি দিন
+    window.open("https://dkwin9.com/#/saasLottery", "_blank");
+    alert("DK Win ওপেন হয়েছে! এখন গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
+}
+
+// ২. অটো-রিডার থেকে আসা ডাটা গ্রহণ করার লজিক
+window.addEventListener("message", (event) => {
+    if (event.data && event.data.type === 'AUTO_INPUT') {
+        let detectedSize = event.data.data;
+        
+        // একই ডাটা বারবার আসা বন্ধ করতে চেক
+        if (inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) return;
+
+        if (inputs.length >= 10) inputs.shift();
+        inputs.push({ t: detectedSize });
+        
+        console.log("Auto-Input Received: " + detectedSize);
+        
+        // ডাটা পাওয়ার সাথে সাথে আপনার ১১-ব্রেন মডেল রান হবে
+        if (typeof runAIModel === "function") {
+            runAIModel();
+        }
+    }
+}, false);
 </script>
 </body>
 </html>
