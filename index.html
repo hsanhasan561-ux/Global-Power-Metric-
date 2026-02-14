@@ -75,20 +75,16 @@
     <div id="patternDisplay">আগের ১০টি রেজাল্ট ইনপুট দিন</div>
 
     <input type="number" id="periodInput" placeholder="এখানে পিরিয়ড নম্বর লিখুন">
-<div style="display: flex; flex-direction: column; gap: 15px; padding: 15px; margin-top: 10px;">
 
-    <button onclick="runAIModel()" style="width: 100%; padding: 18px; background: #00e5ff; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
-       🚀 GET PRO SIGNAL
-    </button>
+    <div style="display: flex; flex-direction: column; gap: 15px; padding: 15px; margin-top: 10px;">
+        <button onclick="runAIModel()" style="width: 100%; padding: 18px; background: #00e5ff; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
+           🚀 GET PRO SIGNAL
+        </button>
+        <button onclick="openGame()" style="width: 100%; padding: 18px; background: #00FFCC; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
+           🚀 OPEN DK WIN & START AUTO-SCAN
+        </button>
+    </div>
 
-    <button onclick="openGame()" style="width: 100%; padding: 18px; background: #00FFCC; color: #000; border: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
-       🚀 OPEN DK WIN & START AUTO-SCAN
-    </button>
-
-</div>
-    
-</div>
-    
     <div id="searchLoader" style="display:none; margin:15px 0; color:var(--accent);">SQL ANALYZING...</div>
 
     <div id="floatingOverlay">
@@ -118,10 +114,10 @@
     let currentNumbers = "";
     let currentPatternKey = "";
 
-    // শর্ত ১ ও ৮: SQL প্যাটার্ন এবং লার্নিং ডাটাবেজ
     const DB_NAME = "NAJMUL_AI_SYSTEM";
     const STORE_NAME = "core_memory";
     let db;
+
     const request = indexedDB.open(DB_NAME, 3);
     request.onupgradeneeded = (e) => {
         db = e.target.result;
@@ -129,423 +125,23 @@
             db.createObjectStore(STORE_NAME, { keyPath: "pattern" });
         }
     };
-        request.onsuccess = (e) => { 
+    request.onsuccess = (e) => { 
         db = e.target.result; 
         const tx = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
-        
-        // নিচের এই DATA এর ভেতরেই হাজার হাজার প্যাটার্ন যোগ করবেন
         const DATA = [
             { pattern: "BBB", next: "S" }, 
             { pattern: "SSS", next: "B" },
             { pattern: "BBSS", next: "B" },
             { pattern: "SSBB", next: "S" },
             { pattern: "BSBS", next: "B" },
-            { pattern: "SBSB", next: "S" },
-            // আপনি চাইলে এখানে আরও হাজার হাজার লাইন যোগ করতে পারেন
-            { pattern: "BBB", next: "S" }, { pattern: "SSS", next: "B" }, { pattern: "BBS", next: "S" }, { pattern: "SSB", next: "B" },
-{ pattern: "BSB", next: "S" }, { pattern: "SBS", next: "B" }, { pattern: "BSS", next: "B" }, { pattern: "SBB", next: "S" },
-{ pattern: "BBSS", next: "B" }, { pattern: "SSBB", next: "S" }, { pattern: "BSBS", next: "B" }, { pattern: "SBSB", next: "S" },
-{ pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-{ pattern: "BBBBB", next: "S" }, { pattern: "SSSSS", next: "B" }, { pattern: "BSBSS", next: "B" }, { pattern: "SBSBB", next: "S" },
-{ pattern: "BSSBS", next: "B" }, { pattern: "SBBSS", next: "S" }, { pattern: "BBSSB", next: "S" }, { pattern: "SSBBS", next: "B" },
-{ pattern: "BBBSS", next: "S" }, { pattern: "SSSBB", next: "B" }, { pattern: "BBSSS", next: "B" }, { pattern: "SSBBB", next: "S" },
-{ pattern: "BBSBS", next: "B" }, { pattern: "SSBSB", next: "S" }, { pattern: "BSBSB", next: "S" }, { pattern: "SBSBS", next: "B" },
-{ pattern: "BBBBSS", next: "B" }, { pattern: "SSSSBB", next: "S" }, { pattern: "BBBSSS", next: "B" }, { pattern: "SSSBBB", next: "S" },
-{ pattern: "BBSSBB", next: "S" }, { pattern: "SSBBSS", next: "B" }, { pattern: "BSBSBS", next: "B" }, { pattern: "SBSBSB", next: "S" },
-{ pattern: "BBBBBB", next: "S" }, { pattern: "SSSSSS", next: "B" }, { pattern: "BSSBSS", next: "B" }, { pattern: "SBBSSB", next: "S" },
-{ pattern: "BSSSSS", next: "B" }, { pattern: "SBBBBB", next: "S" }, { pattern: "BBBSBS", next: "S" }, { pattern: "SSBSBS", next: "B" },
-{ pattern: "BBSSBS", next: "B" }, { pattern: "SSBBSS", next: "B" }, { pattern: "BSSBBS", next: "S" }, { pattern: "SBBSSB", next: "B" },
-{ pattern: "BBBSSB", next: "S" }, { pattern: "SSBBBS", next: "B" }, { pattern: "BBSBSS", next: "B" }, { pattern: "SSBBSB", next: "S" },
-{ pattern: "BBSBBS", next: "S" }, { pattern: "SSBSSB", next: "B" }, { pattern: "BBBBBS", next: "S" }, { pattern: "SSSSSB", next: "B" },
-{ pattern: "BSSBBS", next: "S" }, { pattern: "SBBSSB", next: "B" }, { pattern: "BSBSBSB", next: "S" }, { pattern: "SBSBSBS", next: "B" },
-{ pattern: "BBSSBBS", next: "B" }, { pattern: "SSBBSSB", next: "S" }, { pattern: "BBBSSSB", next: "S" }, { pattern: "SSSBBBS", next: "B" },
-{ pattern: "BSSBBSS", next: "B" }, { pattern: "SBBSSBB", next: "S" }, { pattern: "BBBBBSS", next: "B" }, { pattern: "SSSSSBB", next: "S" },
-{ pattern: "BSBSBSBS", next: "B" }, { pattern: "SBSBSBSB", next: "S" }, { pattern: "BBBBSSSS", next: "B" }, { pattern: "SSSSBBBB", next: "S" },
-{ pattern: "BBSSBBSS", next: "B" }, { pattern: "SSBBSSBB", next: "S" }, { pattern: "BSSSBSSS", next: "B" }, { pattern: "SBBBSBBB", next: "S" },
-{ pattern: "BBBSBBBS", next: "S" }, { pattern: "SSBSSBSS", next: "B" }, { pattern: "BBBBBBSS", next: "B" }, { pattern: "SSSSSSBB", next: "S" },
-{ pattern: "BBSBBSBS", next: "B" }, { pattern: "SSBSSBSB", next: "S" }, { pattern: "BSBSBSBSB", next: "S" }, { pattern: "SBSBSBSBS", next: "B" },
-{ pattern: "BBBBSSSSS", next: "B" }, { pattern: "SSSSBBBBB", next: "S" }, { pattern: "BBSSBBSSB", next: "S" }, { pattern: "SSBBSSBBS", next: "B" },
-{ pattern: "BBBSSBBBS", next: "S" }, { pattern: "SSSBBSSSB", next: "B" }, { pattern: "BSBSBSBSBS", next: "B" }, { pattern: "SBSBSBSBSB", next: "S" },
-{ pattern: "BBBBBSSSSS", next: "B" }, { pattern: "SSSSSBBBBB", next: "S" }, { pattern: "BBBBBBBBSS", next: "B" }, { pattern: "SSSSSSSSBB", next: "S" },
-{ pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" }, { pattern: "BSBB", next: "S" }, { pattern: "SBSS", next: "B" },
-{ pattern: "BSSB", next: "S" }, { pattern: "SBBB", next: "B" }, { pattern: "BSSS", next: "S" }, { pattern: "SBBB", next: "B" },
-{ pattern: "BBSSB", next: "S" }, { pattern: "SSBBS", next: "B" }, { pattern: "BSBSB", next: "S" }, { pattern: "SBSBS", next: "B" },
-{ pattern: "BBBSB", next: "S" }, { pattern: "SSSBS", next: "B" }, { pattern: "BBSBS", next: "S" }, { pattern: "SSBSB", next: "B" },
-{ pattern: "BSBSS", next: "B" }, { pattern: "SBSBB", next: "S" }, { pattern: "BSSBS", next: "B" }, { pattern: "SBBSS", next: "S" },
-{ pattern: "BBBBB", next: "S" }, { pattern: "SSSSS", next: "B" }, { pattern: "BBBBS", next: "S" }, { pattern: "SSSSP", next: "B" },
-{ pattern: "BBSSB", next: "S" }, { pattern: "SSBBS", next: "B" }, { pattern: "BSSBB", next: "S" }, { pattern: "SBBSS", next: "B" },
-{ pattern: "BSBBS", next: "S" }, { pattern: "SBSBB", next: "B" }, { pattern: "BBSSB", next: "S" }, { pattern: "SSBBS", next: "B" },
-{ pattern: "BBSBSB", next: "S" }, { pattern: "SSBSBS", next: "B" }, { pattern: "BSBSBS", next: "S" }, { pattern: "SBSBSB", next: "B" },
-{ pattern: "BBBBSS", next: "B" }, { pattern: "SSSSBB", next: "S" }, { pattern: "BBBSSS", next: "B" }, { pattern: "SSSBBB", next: "S" },
-{ pattern: "BBSBSS", next: "B" }, { pattern: "SSBSBB", next: "S" }, { pattern: "BSBSSB", next: "B" }, { pattern: "SBSBBS", next: "S" },
-{ pattern: "BBSSBS", next: "B" }, { pattern: "SSBBSS", next: "S" }, { pattern: "BSSBBS", next: "B" }, { pattern: "SBBSSB", next: "S" },
-{ pattern: "BBBBSB", next: "S" }, { pattern: "SSSSBS", next: "B" }, { pattern: "BBSBBB", next: "S" }, { pattern: "SSBSSS", next: "B" },
-{ pattern: "BSBBBS", next: "S" }, { pattern: "SBSBBS", next: "B" }, { pattern: "BSSSSS", next: "B" }, { pattern: "SBBBBB", next: "S" },
-{ pattern: "BBBBBB", next: "S" }, { pattern: "SSSSSS", next: "B" }, { pattern: "BSBSSB", next: "B" }, { pattern: "SBSBBS", next: "S" },
-{ pattern: "BSSBSS", next: "B" }, { pattern: "SBBSSB", next: "S" }, { pattern: "BBBSBS", next: "B" }, { pattern: "SSBSBS", next: "S" },
-{ pattern: "BSSBBB", next: "S" }, { pattern: "SBBSSS", next: "B" }, { pattern: "BBSSBB", next: "S" }, { pattern: "SSBBSS", next: "B" },
-{ pattern: "BSBSBSB", next: "S" }, { pattern: "SBSBSBS", next: "B" }, { pattern: "BBSSBBS", next: "B" }, { pattern: "SSBBSSB", next: "S" },
-{ pattern: "BBBBSSS", next: "B" }, { pattern: "SSSSBBB", next: "S" }, { pattern: "BSSBSSB", next: "B" }, { pattern: "SBBSSBB", next: "S" },
-{ pattern: "BSBSSBS", next: "B" }, { pattern: "SBSBBSS", next: "S" }, { pattern: "BBSSBSS", next: "B" }, { pattern: "SSBBSSB", next: "S" },
-{ pattern: "BBBSSBS", next: "B" }, { pattern: "SSSBBSB", next: "S" }, { pattern: "BBSBSBS", next: "B" }, { pattern: "SSBSBSB", next: "S" },
-{ pattern: "BSSBBSS", next: "B" }, { pattern: "SBBSSBB", next: "S" }, { pattern: "BSBSBBS", next: "S" }, { pattern: "SBSBSBB", next: "B" },
-{ pattern: "BBBBBSS", next: "B" }, { pattern: "SSSSSBB", next: "S" }, { pattern: "BBBBBBB", next: "S" }, { pattern: "SSSSSSS", next: "B" },
-{ pattern: "BSBSBSBS", next: "B" }, { pattern: "SBSBSBSB", next: "S" }, { pattern: "BBSSBBSS", next: "B" }, { pattern: "SSBBSSBB", next: "S" },
-{ pattern: "BBBBSSSS", next: "B" }, { pattern: "SSSSBBBB", next: "S" }, { pattern: "BSSBSSBS", next: "B" }, { pattern: "SBBSSBBS", next: "S" },
-{ pattern: "BSBSSBBS", next: "B" }, { pattern: "SBSBBSSB", next: "S" }, { pattern: "BBSSBSSB", next: "B" }, { pattern: "SSBBSSBS", next: "S" },
-{ pattern: "BBBSSBSB", next: "B" }, { pattern: "SSSBBSSB", next: "S" }, { pattern: "BBSBSBSB", next: "B" }, { pattern: "SSBSBSBS", next: "S" },
-{ pattern: "BSSBBSSB", next: "B" }, { pattern: "SBBSSBBS", next: "S" }, { pattern: "BSBSBBSS", next: "B" }, { pattern: "SBSBSBBS", next: "S" },
-{ pattern: "BBBBBSSS", next: "B" }, { pattern: "SSSSSBBB", next: "S" }, { pattern: "BBBBBBBB", next: "S" }, { pattern: "SSSSSSSS", next: "B" },
-{ pattern: "BSBSBSBSB", next: "S" }, { pattern: "SBSBSBSBS", next: "B" }, { pattern: "BBSSBBSSB", next: "S" }, { pattern: "SSBBSSBBS", next: "B" },
-{ pattern: "BBBBSSSSS", next: "B" }, { pattern: "SSSSBBBBB", next: "S" }, { pattern: "BSSBSSBSS", next: "B" }, { pattern: "SBBSSBBSS", next: "S" },
-{ pattern: "BSBSSBBSS", next: "B" }, { pattern: "SBSBBSSBB", next: "S" }, { pattern: "BBSSBSSBB", next: "B" }, { pattern: "SSBBSSBSS", next: "S" },
-{ pattern: "BBBSSBSBS", next: "B" }, { pattern: "SSSBBSSBS", next: "S" }, { pattern: "BBSBSBSBS", next: "B" }, { pattern: "SSBSBSBSB", next: "S" },
-{ pattern: "BSSBBSSBB", next: "B" }, { pattern: "SBBSSBBSS", next: "S" }, { pattern: "BSBSBBSSS", next: "B" }, { pattern: "SBSBSBBSS", next: "S" },
-{ pattern: "BBBBBSSSS", next: "B" }, { pattern: "SSSSSBBBB", next: "S" }, { pattern: "BBBBBBBBB", next: "S" }, { pattern: "SSSSSSSSS", next: "B" },
-{ pattern: "BSBSBSBSBS", next: "B" }, { pattern: "SBSBSBSBSB", next: "S" }, { pattern: "BBSSBBSSBB", next: "B" }, { pattern: "SSBBSSBBSS", next: "S" },
-{ pattern: "BBBBSSSSSS", next: "B" }, { pattern: "SSSSBBBBBB", next: "S" }, { pattern: "BSSBSSBSSB", next: "B" }, { pattern: "SBBSSBBSSB", next: "S" },
-{ pattern: "BSBSSBBSSB", next: "B" }, { pattern: "SBSBBSSBBS", next: "S" }, { pattern: "BBSSBSSBBS", next: "B" }, { pattern: "SSBBSSBSSB", next: "S" },
-{ pattern: "BBBSSBSBSB", next: "B" }, { pattern: "SSSBBSSBSB", next: "S" }, { pattern: "BBSBSBSBSB", next: "B" }, { pattern: "SSBSBSBSBS", next: "S" },
-{ pattern: "BSSBBSSBBS", next: "B" }, { pattern: "SBBSSBBSSB", next: "S" }, { pattern: "BSBSBBSSSS", next: "B" }, { pattern: "SBSBSBBSSS", next: "S" },
-{ pattern: "BBBBBSSSSS", next: "B" }, { pattern: "SSSSSBBBBB", next: "S" }, { pattern: "BBBBBBBBBB", next: "S" }, { pattern: "SSSSSSSSSS", next: "B" },
-{ pattern: "BSSB", next: "B" }, { pattern: "SBBS", next: "S" }, { pattern: "BSBB", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBBS", next: "B" }, { pattern: "SSSB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSS", next: "S" }, { pattern: "SSBB", next: "B" }, { pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" },
-{ pattern: "BSBS", next: "S" }, { pattern: "SBSB", next: "B" }, { pattern: "BSSB", next: "S" }, { pattern: "SBBS", next: "B" },
-{ pattern: "BBBB", next: "S" }, { pattern: "SSSS", next: "B" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-{ pattern: "BBSS", next: "B" }, { pattern: "SSBB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSB", next: "B" }, { pattern: "SSBS", next: "S" }, { pattern: "BSBB", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBBS", next: "B" }, { pattern: "SSSB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSS", next: "S" }, { pattern: "SSBB", next: "B" }, { pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" },
-{ pattern: "BSBS", next: "S" }, { pattern: "SBSB", next: "B" }, { pattern: "BSSB", next: "S" }, { pattern: "SBBS", next: "B" },
-{ pattern: "BBBB", next: "S" }, { pattern: "SSSS", next: "B" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-{ pattern: "BBSS", next: "B" }, { pattern: "SSBB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSB", next: "B" }, { pattern: "SSBS", next: "S" }, { pattern: "BSBB", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBBS", next: "B" }, { pattern: "SSSB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSS", next: "S" }, { pattern: "SSBB", next: "B" }, { pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" },
-{ pattern: "BSBS", next: "S" }, { pattern: "SBSB", next: "B" }, { pattern: "BSSB", next: "S" }, { pattern: "SBBS", next: "B" },
-{ pattern: "BBBB", next: "S" }, { pattern: "SSSS", next: "B" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-{ pattern: "BBSS", next: "B" }, { pattern: "SSBB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSB", next: "B" }, { pattern: "SSBS", next: "S" }, { pattern: "BSBB", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBBS", next: "B" }, { pattern: "SSSB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSS", next: "S" }, { pattern: "SSBB", next: "B" }, { pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" },
-{ pattern: "BSBS", next: "S" }, { pattern: "SBSB", next: "B" }, { pattern: "BSSB", next: "S" }, { pattern: "SBBS", next: "B" },
-{ pattern: "BBBB", next: "S" }, { pattern: "SSSS", next: "B" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-{ pattern: "BBSS", next: "B" }, { pattern: "SSBB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSB", next: "B" }, { pattern: "SSBS", next: "S" }, { pattern: "BSBB", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBBS", next: "B" }, { pattern: "SSSB", next: "S" }, { pattern: "BSSS", next: "B" }, { pattern: "SBBB", next: "S" },
-{ pattern: "BBSS", next: "S" }, { pattern: "SSBB", next: "B" }, { pattern: "BBSB", next: "S" }, { pattern: "SSBS", next: "B" },
-{ pattern: "BSBS", next: "S" }, { pattern: "SBSB", next: "B" }, { pattern: "BSSB", next: "S" }, { pattern: "SBBS", next: "B" },
-{ pattern: "BBBB", next: "S" }, { pattern: "SSSS", next: "B" }, { pattern: "BBBS", next: "S" }, { pattern: "SSSB", next: "B" },
-            // ৩০টি ছবির ডাটা বিশ্লেষণ অনুযায়ী ১ সংখ্যার প্যাটার্ন
-    { pattern: "B", next: "S" }, // Big আসলে পরবর্তী Small হওয়ার সম্ভাবনা
-    { pattern: "S", next: "B" }, // Small আসলে পরবর্তী Big হওয়ার সম্ভাবনা
-    { pattern: "B", next: "B" }, // Big এর পর Big (Trend ফলো করলে)
-    { pattern: "S", next: "S" },  // Small এর পর Small (Trend ফলো করলে)
-            // ছবির ডাটা অনুযায়ী ২ সংখ্যার প্যাটার্ন
-    { pattern: "BB", next: "B" }, 
-    { pattern: "BB", next: "S" },
-    { pattern: "SS", next: "S" }, 
-    { pattern: "SS", next: "B" },
-    { pattern: "BS", next: "S" }, 
-    { pattern: "BS", next: "B" },
-    { pattern: "SB", next: "B" }, 
-    { pattern: "SB", next: "S" },
-    
-    // ছবির গভীর বিশ্লেষণ থেকে আরও কিছু কম্বিনেশন
-    { pattern: "BB", next: "S" }, 
-    { pattern: "SS", next: "B" },
-    { pattern: "BS", next: "B" }, 
-    { pattern: "SB", next: "S" },
-        // --- ৩ অক্ষরের প্যাটার্ন (ছবি থেকে নেওয়া) ---
-    { pattern: "BBB", next: "S" },
-    { pattern: "BBS", next: "S" },
-    { pattern: "BSB", next: "S" },
-    { pattern: "BSS", next: "B" },
-    { pattern: "SBB", next: "S" },
-    { pattern: "SBS", next: "B" },
-    { pattern: "SSB", next: "B" },
-    { pattern: "SSS", next: "B" },
-
-    // --- ৪ অক্ষরের প্যাটার্ন (ছবি থেকে নেওয়া) ---
-    { pattern: "BBBB", next: "S" },
-    { pattern: "BBBS", next: "S" },
-    { pattern: "BBSS", next: "B" },
-    { pattern: "BSSS", next: "B" },
-    { pattern: "SSSS", next: "B" },
-    { pattern: "SSSB", next: "B" },
-    { pattern: "SSBB", next: "S" },
-    { pattern: "SBBB", next: "S" },
-    { pattern: "BSBS", next: "S" },
-    { pattern: "SBSB", next: "B" },
-    { pattern: "BSSB", next: "S" },
-    { pattern: "SBBS", next: "B" },
-    // --- ৩ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BBB", next: "S" },
-    { pattern: "SSS", next: "B" },
-    { pattern: "BBS", next: "B" },
-    { pattern: "SSB", next: "S" },
-    { pattern: "BSB", next: "B" },
-    { pattern: "SBS", next: "S" },
-    { pattern: "BSS", next: "S" },
-    { pattern: "SBB", next: "B" },
-    { pattern: "SSB", next: "B" },
-    { pattern: "BBS", next: "S" },
-
-    // --- ৪ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BBBB", next: "S" },
-    { pattern: "SSSS", next: "B" },
-    { pattern: "BBSS", next: "B" },
-    { pattern: "SSBB", next: "S" },
-    { pattern: "BSBS", next: "B" },
-    { pattern: "SBSB", next: "S" },
-    { pattern: "BSSB", next: "B" },
-    { pattern: "SBBS", next: "S" },
-    { pattern: "BSSS", next: "B" },
-    { pattern: "SBBB", next: "S" },
-    { pattern: "SSBS", next: "B" },
-    { pattern: "BBBS", next: "S" },
-        // --- ২ সংখ্যার প্যাটার্ন (Short Trend) ---
-    { pattern: "BB", next: "S" },
-    { pattern: "SS", next: "B" },
-    { pattern: "BS", next: "B" },
-    { pattern: "SB", next: "S" },
-    { pattern: "BB", next: "B" },
-    { pattern: "SS", next: "S" },
-
-    // --- ৩ সংখ্যার প্যাটার্ন (Regular Trend) ---
-    { pattern: "BBB", next: "S" },
-    { pattern: "SSS", next: "B" },
-    { pattern: "BBS", next: "B" },
-    { pattern: "SSB", next: "S" },
-    { pattern: "BSB", next: "S" },
-    { pattern: "SBS", next: "B" },
-    { pattern: "BSS", next: "B" },
-    { pattern: "SBB", next: "S" },
-    { pattern: "BSB", next: "B" },
-    { pattern: "SBS", next: "S" },
-    { pattern: "SSB", next: "B" },
-    { pattern: "BBS", next: "S" },
-    // --- ৩ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BSB", next: "S" },
-    { pattern: "SBS", next: "B" },
-    { pattern: "BBS", next: "S" },
-    { pattern: "SSB", next: "B" },
-    { pattern: "BSS", next: "B" },
-    { pattern: "SBB", next: "S" },
-
-    // --- ৪ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BSBS", next: "S" },
-    { pattern: "SBSB", next: "B" },
-    { pattern: "BBSS", next: "B" },
-    { pattern: "SSBB", next: "S" },
-    { pattern: "BSSB", next: "S" },
-    { pattern: "SBBS", next: "B" },
-
-    // --- ৫ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BSBSB", next: "S" },
-    { pattern: "SBSBS", next: "B" },
-    { pattern: "BBBBB", next: "S" },
-    { pattern: "SSSSS", next: "B" },
-    { pattern: "BSSBB", next: "S" },
-    { pattern: "SBBSS", next: "B" },
-
-    // --- ৬ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BSBSBS", next: "S" },
-    { pattern: "SBSBSB", next: "B" },
-    { pattern: "BBSSBB", next: "S" },
-    { pattern: "SSBBSS", next: "B" },
-    { pattern: "BSSBSS", next: "B" },
-    { pattern: "SBB SBB", next: "S" },
-     // --- ৫ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BBBBB", next: "S" },
-    { pattern: "SSSSS", next: "B" },
-    { pattern: "BBBBS", next: "S" },
-    { pattern: "SSSSB", next: "B" },
-    { pattern: "BBSSB", next: "S" },
-    { pattern: "SSBBS", next: "B" },
-    { pattern: "BSBSB", next: "S" },
-    { pattern: "SBSBS", next: "B" },
-    { pattern: "BSSBB", next: "S" },
-    { pattern: "SBBSS", next: "B" },
-    { pattern: "BSBSS", next: "B" },
-    { pattern: "SBSBB", next: "S" },
-
-    // --- ৬ সংখ্যার প্যাটার্ন (ছবি থেকে সংগৃহীত) ---
-    { pattern: "BBBBBB", next: "S" },
-    { pattern: "SSSSSS", next: "B" },
-    { pattern: "BBSSBB", next: "S" },
-    { pattern: "SSBBSS", next: "B" },
-    { pattern: "BSBSBS", next: "S" },
-    { pattern: "SBSBSB", next: "B" },
-    { pattern: "BSSBSS", next: "B" },
-    { pattern: "SBB SBB", next: "S" },
-    { pattern: "BBBSSS", next: "B" },
-    { pattern: "SSSBBB", next: "S" },
-    { pattern: "BBSBBS", next: "S" },
-    { pattern: "SSBSSB", next: "B" },
-            { pattern: "BBBBBBBBBB", next: "S" },
-            { pattern: "SSSSSSSSSS", next: "B" },
-            { pattern: "BSBSBSBSBS", next: "S" },
-            { pattern: "SBSBSBSBSB", next: "B" },
-            { pattern: "SSSSSBBBBB", next: "S" },
-            { pattern: "SSSSBBBBBS", next: "S" },
-            { pattern: "SSSBBBBSSB", next: "B" },
-            { pattern: "SSBBBBSSBS", next: "S" },
-            { pattern: "SBBBBSSBSB", next: "B" }, 
-            { pattern: "BBBBSSBSBB", next: "S" },
-            { pattern: "BBBSSBSBBS", next: "S" }, 
-            { pattern: "BBSSBSBBSS", next: "S" },
-            { pattern: "BSSBSBBSSB", next: "B" },
-            { pattern: "SSBSBBSSBS", next: "B" },
-           { pattern: "SBSBBSSBSB", next: "S" },
-            { pattern: "BSBBSSBSBB", next: "B" },
-        { pattern: "SBBSSBSBBS", next: "B" }, 
-        { pattern: "BBSSBSBBSS", next: "S" },
-        { pattern: "BSSBSBBSSS", next: "B" }, 
-        { pattern: "SSBSBBSSSS", next: "B" },
-        { pattern: "SBSBBSSSSS", next: "B" }, 
-        { pattern: "BSBBSSSSSBB", next: "S" },
-        { pattern: "BBSSBBSBSB", next: "S" }, 
-        { pattern: "BSSBBSBSBS", next: "B" },
-        { pattern: "SSBBSBSBSB", next: "S" },
-        { pattern: "SBBSBSBSBS", next: "B" },
-        { pattern: "BBSBSBSBSB", next: "S" },
-        { pattern: "BSBSBSBSBS", next: "B" },
-        { pattern: "SBSBSBSBSB", next: "S" }, 
-        { pattern: "BSBSBSBSBB", next: "S" },
-        { pattern: "SBSBSBSBBS", next: "B" },
-        { pattern: "BSBSBSBBSS", next: "B" },
-        { pattern: "SBSBSBBSSS", next: "S" }, 
-        { pattern: "BSBSBBSSSS", next: "S" },
-        { pattern: "SBSBBSSSSS", next: "B" },
-        { pattern: "BSBBSSSSSBB", next: "B"},
-        { pattern: "BSSBBSSBBS", next: "S" },
-        { pattern: "SSBBSSBBSB", next: "B" },
-        { pattern: "SBBSSBBSBB", next: "S" }, 
-        { pattern: "BBSSBBSBBS", next: "B" },
-        { pattern: "BSSBBSBBSB", next: "S" }, 
-        { pattern: "SSBBSBBSBB", next: "S" },
-        { pattern: "SBBSBBSBBS", next: "B" }, 
-        { pattern: "BBSBBSBBSB", next: "B" },
-        { pattern: "BSBBSBBSBS", next: "S" }, 
-        { pattern: "SBBSBBSBSB", next: "B" },
-        { pattern: "BBSBBSBSBB", next: "S" }, 
-        { pattern: "BSBBSBSBBS", next: "S" },
-        { pattern: "BBBBB", next: "S" },
-       { pattern: "SSSSS", next: "B" },
-        { pattern: "BBBB", next: "S" }, 
-        { pattern: "SSSS", next: "B" },
-        { pattern: "BBB", next: "S" }, 
-        { pattern: "SSS", next: "B" },
-        { pattern: "BBS", next: "S" }, 
-        { pattern: "SSB", next: "B" },
-        { pattern: "BSB", next: "S" },
-        { pattern: "SBS", next: "B" },
-        { pattern: "BSS", next: "B" },
-        { pattern: "SBB", next: "S" },
-        { pattern: "BBSS", next: "B" }, 
-        { pattern: "SSBB", next: "S" },
-        { pattern: "BSBS", next: "S" },
-        { pattern: "SBSB", next: "B" },
-        { pattern: "BSBSBSSBSB", next: "B" },
-        { pattern: "SBSBBSBBSB", next: "S" },
-        { pattern: "BSSBSSBSSB", next: "B" }, 
-        { pattern: "SBBSSBBSSB", next: "S" },
-        { pattern: "BBBBSBBBBS", next: "B" },
-        { pattern: "SSSSBSSSSB", next: "S" },
-        { pattern: "BBSSBBSSBB", next: "S" }, 
-        { pattern: "SSBBSSBBSS", next: "B" },
-        { pattern: "BBBSSSBBSB", next: "S" }, 
-        { pattern: "SSSBBBSBSB", next: "B" },
-        { pattern: "BBSBSSBBSB", next: "B" },
-        { pattern: "SSBSBBSBBS", next: "S" },
-            { pattern: "BBB", next: "S" },
-        { pattern: "BBS", next: "S" },
-        { pattern: "BSB", next: "S" },
-        { pattern: "BSS", next: "B" },
-        { pattern: "SBB", next: "S" },
-        { pattern: "SBS", next: "B" },
-        { pattern: "SSB", next: "B" },
-        { pattern: "SSS", next: "B" },
-
-        // --- ৪ অক্ষরের প্যাটার্ন ---
-        { pattern: "BBBB", next: "S" },
-        { pattern: "BBSS", next: "B" },
-        { pattern: "BSBS", next: "S" },
-        { pattern: "SBBB", next: "B" },
-        { pattern: "SBSB", next: "B" },
-        { pattern: "SSBB", next: "S" },
-        { pattern: "SSSS", next: "B" },
-
-        // --- ৫ অক্ষরের প্যাটার্ন ---
-        { pattern: "BBBBB", next: "S" },
-        { pattern: "SSSSS", next: "B" },
-        { pattern: "BSBSB", next: "S" },
-        { pattern: "SBSBS", next: "B" },
-
-        // --- ১০ অক্ষরের প্যাটার্ন (ছবি ও নোটবুক থেকে সংগৃহীত) ---
-        { pattern: "BBBBBBBBBB", next: "S" },
-        { pattern: "SSSSSSSSSS", next: "B" },
-        { pattern: "BSBSBSBSBS", next: "S" },
-        { pattern: "SBSBSBSBSB", next: "B" },
-        { pattern: "SSSSSBBBBB", next: "S" },
-        { pattern: "SSSSBBBBBS", next: "S" },
-        { pattern: "SSSBBBBSSB", next: "B" },
-        { pattern: "SSBBBBSSBS", next: "S" },
-        { pattern: "SBBBBSSBSB", next: "B" }, 
-        { pattern: "BBBBSSBSBB", next: "S" },
-        { pattern: "BBBSSBSBBS", next: "S" }, 
-        { pattern: "BBSSBSBBSS", next: "S" },
-        { pattern: "BSSBSBBSSB", next: "B" },
-        { pattern: "SSBSBBSSBS", next: "B" },
-        { pattern: "SBSBBSSBSB", next: "S" },
-        { pattern: "BSBBSSBSBB", next: "B" },
-        { pattern: "SBBSSBSBBS", next: "B" }, 
-        { pattern: "BSSBSBBSSS", next: "B" }, 
-        { pattern: "SSBSBBSSSS", next: "B" },
-        { pattern: "SBSBBSSSSS", next: "B" }, 
-        { pattern: "BBSSBBSBSB", next: "S" }, 
-        { pattern: "BSSBBSBSBS", next: "B" },
-        { pattern: "SSBBSBSBSB", next: "S" },
-        { pattern: "SBBSBSBSBS", next: "B" },
-        { pattern: "BBSBSBSBSB", next: "S" },
-        { pattern: "BSBSBSBSBB", next: "S" },
-        { pattern: "SBSBSBSBBS", next: "B" },
-        { pattern: "BSBSBSBBSS", next: "B" },
-        { pattern: "SBSBSBBSSS", next: "S" }, 
-        { pattern: "BSBSBBSSSS", next: "S" },
-        { pattern: "BSSBBSSBBS", next: "S" },
-        { pattern: "SSBBSSBBSB", next: "B" },
-        { pattern: "SBBSSBBSBB", next: "S" }, 
-        { pattern: "BBSSBBSBBS", next: "B" },
-        { pattern: "BSSBBSBBSB", next: "S" }, 
-        { pattern: "SSBBSBBSBB", next: "S" },
-        { pattern: "SBBSBBSBBS", next: "B" }, 
-        { pattern: "BBSBBSBBSB", next: "B" },
-        { pattern: "BSBBSBBSBS", next: "S" }, 
-        { pattern: "SBBSBBSBSB", next: "B" },
-        { pattern: "BBSBBSBSBB", next: "S" }, 
-        { pattern: "BSBBSBSBBS", next: "S" },
-        { pattern: "BSBSBSSBSB", next: "B" },
-        { pattern: "SBSBBSBBSB", next: "S" },
-        { pattern: "BSSBSSBSSB", next: "B" }, 
-        { pattern: "SBBSSBBSSB", next: "S" },
-        { pattern: "BBBBSBBBBS", next: "B" },
-        { pattern: "SSSSBSSSSB", next: "S" },
-        { pattern: "BBSSBBSSBB", next: "S" }, 
-        { pattern: "SSBBSSBBSS", next: "B" },
-        { pattern: "BBBSSSBBSB", next: "S" }, 
-        { pattern: "SSSBBBSBSB", next: "B" },
-        { pattern: "BBSBSSBBSB", next: "B" },
-        { pattern: "SSBSBBSBBS", next: "S" }
+            { pattern: "SBSB", next: "S" }
         ];
-
         DATA.forEach(d => {
             const getReq = tx.get(d.pattern);
             getReq.onsuccess = () => { if(!getReq.result) tx.put(d); };
         });
     };
+
     function checkLogin() {
         if(document.getElementById('passInput').value === "0099") {
             document.getElementById('loginScreen').style.display = "none";
@@ -580,27 +176,23 @@
         document.getElementById('counter').innerText = `Input (${inputs.length}/10)`;
     }
 
-    function startProcess() {
-        const period = document.getElementById('periodInput').value;
-        if (!period || inputs.length < 10) { alert("পিরিয়ড এবং ১০টি রেজাল্ট দিন!"); return; }
-        document.getElementById('searchLoader').style.display = "block";
-        setTimeout(runAIModel, 1500);
-    }
-    // আপনার আগের গ্লোবাল ভেরিয়েবলগুলো (যেমন inputs, wallet, mStep ইত্যাদি) এখানে থাকবে
-
     async function runAIModel() {
-        // ১. ইনপুট চেক
+        // পিরিয়ড নম্বর চেক
+        const periodVal = document.getElementById('periodInput').value;
+        if (!periodVal) {
+            alert("দয়া করে পিরিয়ড নম্বর লিখুন!");
+            return;
+        }
+
         if (inputs.length < 10) {
-            alert("দয়া করে অটো-স্ক্যানারের মাধ্যমে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
+            alert("দয়া করে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
             return; 
         }
 
-        // ২. লোডার দেখানো
         const loader = document.getElementById('searchLoader');
         if(loader) loader.style.display = "block";
 
         currentPatternKey = inputs.map(i => i.t).join('');
-        
         let prediction = ""; 
         let modeHTML = "";
         let confidence = 93;
@@ -665,28 +257,23 @@
             return; 
         }
 
-        // --- ৩. আউটপুট প্রসেসিং ---
         if(loader) loader.style.display = "none";
         
         currentPrediction = (prediction === "B") ? "BIG" : "SMALL";
         let pNums = (prediction === "B") ? [9,8,7,6,5] : [4,3,2,1,0];
         currentNumbers = pNums.sort(() => Math.random() - 0.5).slice(0,3).join(',');
 
-        // UI আপডেট
         document.getElementById('aiMode').innerHTML = modeHTML;
         document.getElementById('floatPred').innerText = currentPrediction;
         document.getElementById('floatPred').style.color = (prediction === "B") ? "#00FFCC" : "#ff4d4d";
         document.getElementById('floatNums').innerText = "(" + currentNumbers + ")";
         document.getElementById('winRateDisp').innerText = "ACCURACY: " + (confidence + (new Date().getSeconds() % 3)) + "%";
         
-        // বেট ক্যালকুলেশন
         let betAmount = Math.floor((wallet * 2 / 100) * Math.pow(2, mStep));
         document.getElementById('aiBetInfo').innerText = "BET AMOUNT: " + betAmount;
-        
         document.getElementById('floatingOverlay').style.display = "block";
     }
 
-    // ৪. রেকর্ড সেভ করার ফাংশন
     function record(status) {
         let currentBet = Math.floor((wallet * 2 / 100) * Math.pow(2, mStep));
         let predT = (currentPrediction === "BIG") ? "B" : "S";
@@ -708,33 +295,30 @@
         inputs = []; 
         document.getElementById('patternDisplay').innerText = "আগের ১০টি রেজাল্ট ইনপুট দিন";
         document.getElementById('counter').innerText = `Input (0/10)`;
-        
-        if(typeof refreshUI === "function") refreshUI();
+        refreshUI();
         document.getElementById('periodInput').value = "";
     }
 
     function openGame() {
         const gameUrl = "https://dkwin9.com/#/saasLottery";
         window.open(gameUrl, "_blank");
-        alert("গেম ওপেন হয়েছে! এবার গেমের ট্যাবে গিয়ে কনসোল কোডটি রান করুন।");
     }
 
     window.addEventListener("message", (event) => {
         if (event.data && event.data.type === 'AUTO_INPUT') {
             let detectedSize = event.data.data;
             if (inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) return;
-
             if (inputs.length >= 10) inputs.shift();
-            inputs.push({ t: detectedSize });
-            
+            inputs.push({ t: detectedSize, n: '?' });
             document.getElementById('counter').innerText = `Input (${inputs.length}/10)`;
-            document.getElementById('patternDisplay').innerText = inputs.map(i => i.t).join(', ');
-
-            if (inputs.length === 10) {
+            document.getElementById('patternDisplay').innerText = inputs.map(i => i.t).join(' , ');
+            
+            const pVal = document.getElementById('periodInput').value;
+            if (inputs.length === 10 && pVal) {
                 runAIModel();
             }
         }
     }, false);
 </script>
 </body>
-</html
+</html>
