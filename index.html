@@ -179,15 +179,9 @@
     async function runAIModel() {
         // পিরিয়ড নম্বর চেক
         const periodVal = document.getElementById('periodInput').value;
-        if (!periodVal) {
-            alert("দয়া করে পিরিয়ড নম্বর লিখুন!");
-            return;
-        }
+        if (!periodVal) return; // অটো স্ক্যান মোডে বিরক্ত না করার জন্য এলার্ট বন্ধ করা হয়েছে
 
-        if (inputs.length < 10) {
-            alert("দয়া করে অন্তত ১০টি রেজাল্ট জমা হতে দিন!");
-            return; 
-        }
+        if (inputs.length < 10) return; // ১০টি ইনপুট না থাকলে ফাংশন চলবে না
 
         const loader = document.getElementById('searchLoader');
         if(loader) loader.style.display = "block";
@@ -307,18 +301,30 @@
     window.addEventListener("message", (event) => {
         if (event.data && event.data.type === 'AUTO_INPUT') {
             let detectedSize = event.data.data;
-            if (inputs.length > 0 && inputs[inputs.length - 1].t === detectedSize) return;
+            let detectedPeriod = event.data.period;
+
+            // একই পিরিয়ডের ডাটা বারবার আসা বন্ধ করতে চেক
+            if (inputs.length > 0 && inputs[inputs.length - 1].p === detectedPeriod) {
+                return; 
+            }
+
             if (inputs.length >= 10) inputs.shift();
-            inputs.push({ t: detectedSize, n: '?' });
+            
+            // ডাটা যোগ করার সময় পিরিয়ডও সেভ করা হচ্ছে
+            inputs.push({ t: detectedSize, n: '?', p: detectedPeriod });
+
             document.getElementById('counter').innerText = `Input (${inputs.length}/10)`;
             document.getElementById('patternDisplay').innerText = inputs.map(i => i.t).join(' , ');
             
-            const pVal = document.getElementById('periodInput').value;
-            if (inputs.length === 10 && pVal) {
+            // পিরিয়ড নম্বর অটো আপডেট
+            document.getElementById('periodInput').value = detectedPeriod + 1; 
+
+            if (inputs.length === 10) {
                 runAIModel();
             }
         }
     }, false);
 </script>
 </body>
-</html>
+    </html>
+    
